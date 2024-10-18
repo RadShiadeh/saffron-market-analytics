@@ -7525,10 +7525,35 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [544]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="k">def</span> <span class="nf">prep_df</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="n">imports</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelFile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="p">{</span><span class="n">sheet_name</span><span class="p">:</span> <span class="n">imports</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">sheet_name</span><span class="p">)</span>
+          <span class="k">for</span> <span class="n">sheet_name</span> <span class="ow">in</span> <span class="n">imports</span><span class="o">.</span><span class="n">sheet_names</span><span class="p">}</span>
+    
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"By-HS6Product"</span><span class="p">]</span>
+    
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span>
+                  <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'Reporter'</span><span class="p">,</span> <span class="s1">'TradeFlow'</span><span class="p">,</span> <span class="s1">'ProductCode'</span><span class="p">,</span> <span class="s1">'Product Description'</span><span class="p">,</span> <span class="s1">'Year'</span><span class="p">,</span> <span class="s1">'Partner'</span><span class="p">,</span> <span class="s1">'Trade Value 1000USD'</span><span class="p">,</span> <span class="s1">'Quantity'</span><span class="p">,</span> <span class="s1">'Quantity Unit'</span><span class="p">])</span>
+
+    <span class="c1">#reporter is always uk, tradeflow = import, productCode = 91020 (saffron), desc = saffron</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"Reporter"</span><span class="p">,</span> <span class="s2">"TradeFlow"</span><span class="p">,</span> <span class="s2">"ProductCode"</span><span class="p">,</span> <span class="s2">"Product Description"</span><span class="p">])</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"Partner"</span><span class="p">:</span> <span class="s2">"From"</span><span class="p">,</span> <span class="s2">"Trade Value 1000USD"</span><span class="p">:</span> <span class="s2">"value in 1000$"</span><span class="p">})</span>
+
+
+
+    <span class="n">df</span><span class="p">[</span><span class="s1">'Cost per kg'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">'value in 1000$'</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">'Quantity'</span><span class="p">]</span>
+    
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">"Quantity"</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span>
 
 <span class="n">uk_import_path_2019</span> <span class="o">=</span> <span class="s2">"./uk-imports-data/uk-import-2019.xlsx"</span>
 <span class="n">uk_import_path_2020</span> <span class="o">=</span> <span class="s2">"./uk-imports-data/uk-import-2020.xlsx"</span>
@@ -7536,126 +7561,1025 @@ a.anchor-link {
 <span class="n">uk_import_path_2022</span> <span class="o">=</span> <span class="s2">"./uk-imports-data/uk-import-2022.xlsx"</span>
 <span class="n">uk_import_path_2023</span> <span class="o">=</span> <span class="s2">"./uk-imports-data/uk-import-2023.xlsx"</span>
 
-<span class="n">imports_2019</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelFile</span><span class="p">(</span><span class="n">uk_import_path_2019</span><span class="p">)</span>
-<span class="n">imports_2020</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelFile</span><span class="p">(</span><span class="n">uk_import_path_2020</span><span class="p">)</span>
-<span class="n">imports_2021</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelFile</span><span class="p">(</span><span class="n">uk_import_path_2021</span><span class="p">)</span>
-<span class="n">imports_2022</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelFile</span><span class="p">(</span><span class="n">uk_import_path_2022</span><span class="p">)</span>
-<span class="n">imports_2023</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelFile</span><span class="p">(</span><span class="n">uk_import_path_2023</span><span class="p">)</span>
-
-<span class="n">dfs_19</span> <span class="o">=</span> <span class="p">{</span><span class="n">sheet_name</span><span class="p">:</span> <span class="n">imports_2019</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">sheet_name</span><span class="p">)</span> 
-          <span class="k">for</span> <span class="n">sheet_name</span> <span class="ow">in</span> <span class="n">imports_2019</span><span class="o">.</span><span class="n">sheet_names</span><span class="p">}</span>
-
-<span class="n">dfs_20</span> <span class="o">=</span> <span class="p">{</span><span class="n">sheet_name</span><span class="p">:</span> <span class="n">imports_2020</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">sheet_name</span><span class="p">)</span> 
-          <span class="k">for</span> <span class="n">sheet_name</span> <span class="ow">in</span> <span class="n">imports_2020</span><span class="o">.</span><span class="n">sheet_names</span><span class="p">}</span>
-
-<span class="n">dfs_21</span> <span class="o">=</span> <span class="p">{</span><span class="n">sheet_name</span><span class="p">:</span> <span class="n">imports_2021</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">sheet_name</span><span class="p">)</span> 
-          <span class="k">for</span> <span class="n">sheet_name</span> <span class="ow">in</span> <span class="n">imports_2021</span><span class="o">.</span><span class="n">sheet_names</span><span class="p">}</span>
-
-<span class="n">dfs_22</span> <span class="o">=</span> <span class="p">{</span><span class="n">sheet_name</span><span class="p">:</span> <span class="n">imports_2022</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">sheet_name</span><span class="p">)</span> 
-          <span class="k">for</span> <span class="n">sheet_name</span> <span class="ow">in</span> <span class="n">imports_2022</span><span class="o">.</span><span class="n">sheet_names</span><span class="p">}</span>
-
-<span class="n">dfs_23</span> <span class="o">=</span> <span class="p">{</span><span class="n">sheet_name</span><span class="p">:</span> <span class="n">imports_2023</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">sheet_name</span><span class="p">)</span> 
-          <span class="k">for</span> <span class="n">sheet_name</span> <span class="ow">in</span> <span class="n">imports_2023</span><span class="o">.</span><span class="n">sheet_names</span><span class="p">}</span>
-
-
-<span class="n">data_19</span> <span class="o">=</span> <span class="n">dfs_19</span><span class="p">[</span><span class="s2">"By-HS6Product"</span><span class="p">]</span>
-<span class="n">data_20</span> <span class="o">=</span> <span class="n">dfs_20</span><span class="p">[</span><span class="s2">"By-HS6Product"</span><span class="p">]</span>
-<span class="n">data_21</span> <span class="o">=</span> <span class="n">dfs_21</span><span class="p">[</span><span class="s2">"By-HS6Product"</span><span class="p">]</span>
-<span class="n">data_22</span> <span class="o">=</span> <span class="n">dfs_22</span><span class="p">[</span><span class="s2">"By-HS6Product"</span><span class="p">]</span>
-<span class="n">data_23</span> <span class="o">=</span> <span class="n">dfs_23</span><span class="p">[</span><span class="s2">"By-HS6Product"</span><span class="p">]</span>
+<span class="n">data_19</span> <span class="o">=</span> <span class="n">prep_df</span><span class="p">(</span><span class="n">uk_import_path_2019</span><span class="p">)</span>
+<span class="n">data_20</span> <span class="o">=</span> <span class="n">prep_df</span><span class="p">(</span><span class="n">uk_import_path_2020</span><span class="p">)</span>
+<span class="n">data_21</span> <span class="o">=</span> <span class="n">prep_df</span><span class="p">(</span><span class="n">uk_import_path_2021</span><span class="p">)</span>
+<span class="n">data_22</span> <span class="o">=</span> <span class="n">prep_df</span><span class="p">(</span><span class="n">uk_import_path_2022</span><span class="p">)</span>
+<span class="n">data_23</span> <span class="o">=</span> <span class="n">prep_df</span><span class="p">(</span><span class="n">uk_import_path_2023</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [545]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_19</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data_19</span><span class="p">,</span>
-                  <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'Reporter'</span><span class="p">,</span> <span class="s1">'TradeFlow'</span><span class="p">,</span> <span class="s1">'ProductCode'</span><span class="p">,</span> <span class="s1">'Product Description'</span><span class="p">,</span> <span class="s1">'Year'</span><span class="p">,</span> <span class="s1">'Partner'</span><span class="p">,</span> <span class="s1">'Trade Value 1000USD'</span><span class="p">,</span> <span class="s1">'Quantity'</span><span class="p">,</span> <span class="s1">'Quantity Unit'</span><span class="p">])</span>
-
-<span class="n">data_19</span> <span class="o">=</span> <span class="n">data_19</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"Reporter"</span><span class="p">,</span> <span class="s2">"TradeFlow"</span><span class="p">,</span> <span class="s2">"ProductCode"</span><span class="p">,</span> <span class="s2">"Product Description"</span><span class="p">,</span> <span class="s2">"Quantity Unit"</span><span class="p">])</span>
-
-<span class="n">data_20</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data_20</span><span class="p">,</span>
-                  <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'Reporter'</span><span class="p">,</span> <span class="s1">'TradeFlow'</span><span class="p">,</span> <span class="s1">'ProductCode'</span><span class="p">,</span> <span class="s1">'Product Description'</span><span class="p">,</span> <span class="s1">'Year'</span><span class="p">,</span> <span class="s1">'Partner'</span><span class="p">,</span> <span class="s1">'Trade Value 1000USD'</span><span class="p">,</span> <span class="s1">'Quantity'</span><span class="p">,</span> <span class="s1">'Quantity Unit'</span><span class="p">])</span>
-
-<span class="n">data_20</span> <span class="o">=</span> <span class="n">data_20</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"Reporter"</span><span class="p">,</span> <span class="s2">"TradeFlow"</span><span class="p">,</span> <span class="s2">"ProductCode"</span><span class="p">,</span> <span class="s2">"Product Description"</span><span class="p">,</span> <span class="s2">"Quantity Unit"</span><span class="p">])</span>
-
-<span class="n">data_21</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data_21</span><span class="p">,</span>
-                  <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'Reporter'</span><span class="p">,</span> <span class="s1">'TradeFlow'</span><span class="p">,</span> <span class="s1">'ProductCode'</span><span class="p">,</span> <span class="s1">'Product Description'</span><span class="p">,</span> <span class="s1">'Year'</span><span class="p">,</span> <span class="s1">'Partner'</span><span class="p">,</span> <span class="s1">'Trade Value 1000USD'</span><span class="p">,</span> <span class="s1">'Quantity'</span><span class="p">,</span> <span class="s1">'Quantity Unit'</span><span class="p">])</span>
-
-<span class="n">data_21</span> <span class="o">=</span> <span class="n">data_21</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"Reporter"</span><span class="p">,</span> <span class="s2">"TradeFlow"</span><span class="p">,</span> <span class="s2">"ProductCode"</span><span class="p">,</span> <span class="s2">"Product Description"</span><span class="p">,</span> <span class="s2">"Quantity Unit"</span><span class="p">])</span>
-
-<span class="n">data_22</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data_22</span><span class="p">,</span>
-                  <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'Reporter'</span><span class="p">,</span> <span class="s1">'TradeFlow'</span><span class="p">,</span> <span class="s1">'ProductCode'</span><span class="p">,</span> <span class="s1">'Product Description'</span><span class="p">,</span> <span class="s1">'Year'</span><span class="p">,</span> <span class="s1">'Partner'</span><span class="p">,</span> <span class="s1">'Trade Value 1000USD'</span><span class="p">,</span> <span class="s1">'Quantity'</span><span class="p">,</span> <span class="s1">'Quantity Unit'</span><span class="p">])</span>
-
-<span class="n">data_22</span> <span class="o">=</span> <span class="n">data_22</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"Reporter"</span><span class="p">,</span> <span class="s2">"TradeFlow"</span><span class="p">,</span> <span class="s2">"ProductCode"</span><span class="p">,</span> <span class="s2">"Product Description"</span><span class="p">,</span> <span class="s2">"Quantity Unit"</span><span class="p">])</span>
-
-<span class="n">data_23</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data_23</span><span class="p">,</span>
-                  <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'Reporter'</span><span class="p">,</span> <span class="s1">'TradeFlow'</span><span class="p">,</span> <span class="s1">'ProductCode'</span><span class="p">,</span> <span class="s1">'Product Description'</span><span class="p">,</span> <span class="s1">'Year'</span><span class="p">,</span> <span class="s1">'Partner'</span><span class="p">,</span> <span class="s1">'Trade Value 1000USD'</span><span class="p">,</span> <span class="s1">'Quantity'</span><span class="p">,</span> <span class="s1">'Quantity Unit'</span><span class="p">])</span>
-
-<span class="n">data_23</span> <span class="o">=</span> <span class="n">data_23</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"Reporter"</span><span class="p">,</span> <span class="s2">"TradeFlow"</span><span class="p">,</span> <span class="s2">"ProductCode"</span><span class="p">,</span> <span class="s2">"Product Description"</span><span class="p">,</span> <span class="s2">"Quantity Unit"</span><span class="p">])</span>
-
-<span class="n">data_19</span> <span class="o">=</span> <span class="n">data_19</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"Partner"</span><span class="p">:</span> <span class="s2">"From"</span><span class="p">,</span> <span class="s2">"Trade Value 1000USD"</span><span class="p">:</span> <span class="s2">"value"</span><span class="p">})</span>
-<span class="n">data_20</span> <span class="o">=</span> <span class="n">data_20</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"Partner"</span><span class="p">:</span> <span class="s2">"From"</span><span class="p">,</span> <span class="s2">"Trade Value 1000USD"</span><span class="p">:</span> <span class="s2">"value"</span><span class="p">})</span>
-<span class="n">data_21</span> <span class="o">=</span> <span class="n">data_21</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"Partner"</span><span class="p">:</span> <span class="s2">"From"</span><span class="p">,</span> <span class="s2">"Trade Value 1000USD"</span><span class="p">:</span> <span class="s2">"value"</span><span class="p">})</span>
-<span class="n">data_22</span> <span class="o">=</span> <span class="n">data_22</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"Partner"</span><span class="p">:</span> <span class="s2">"From"</span><span class="p">,</span> <span class="s2">"Trade Value 1000USD"</span><span class="p">:</span> <span class="s2">"value"</span><span class="p">})</span>
-<span class="n">data_23</span> <span class="o">=</span> <span class="n">data_23</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"Partner"</span><span class="p">:</span> <span class="s2">"From"</span><span class="p">,</span> <span class="s2">"Trade Value 1000USD"</span><span class="p">:</span> <span class="s2">"value"</span><span class="p">})</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_19</span>
 </pre></div>
 </div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[545]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Year</th>
+<th>From</th>
+<th>value in 1000$</th>
+<th>Quantity</th>
+<th>Quantity Unit</th>
+<th>Cost per kg</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>1</th>
+<td>2019</td>
+<td>Spain</td>
+<td>2120.64</td>
+<td>55106.00</td>
+<td>Kg</td>
+<td>38.482924</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2019</td>
+<td>Iran, Islamic Rep.</td>
+<td>476.00</td>
+<td>4411.00</td>
+<td>Kg</td>
+<td>107.912038</td>
+</tr>
+<tr>
+<th>13</th>
+<td>2019</td>
+<td>India</td>
+<td>12.56</td>
+<td>2732.00</td>
+<td>Kg</td>
+<td>4.597365</td>
+</tr>
+<tr>
+<th>11</th>
+<td>2019</td>
+<td>Netherlands</td>
+<td>13.80</td>
+<td>2501.53</td>
+<td>Kg</td>
+<td>5.516624</td>
+</tr>
+<tr>
+<th>9</th>
+<td>2019</td>
+<td>Ireland</td>
+<td>18.58</td>
+<td>2464.41</td>
+<td>Kg</td>
+<td>7.539330</td>
+</tr>
+<tr>
+<th>10</th>
+<td>2019</td>
+<td>Afghanistan</td>
+<td>16.36</td>
+<td>2056.00</td>
+<td>Kg</td>
+<td>7.957198</td>
+</tr>
+<tr>
+<th>5</th>
+<td>2019</td>
+<td>Italy</td>
+<td>80.21</td>
+<td>641.00</td>
+<td>Kg</td>
+<td>125.132605</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2019</td>
+<td>France</td>
+<td>307.75</td>
+<td>143.00</td>
+<td>Kg</td>
+<td>2152.097902</td>
+</tr>
+<tr>
+<th>7</th>
+<td>2019</td>
+<td>Poland</td>
+<td>42.50</td>
+<td>127.00</td>
+<td>Kg</td>
+<td>334.645669</td>
+</tr>
+<tr>
+<th>16</th>
+<td>2019</td>
+<td>Romania</td>
+<td>0.38</td>
+<td>29.00</td>
+<td>Kg</td>
+<td>13.103448</td>
+</tr>
+<tr>
+<th>15</th>
+<td>2019</td>
+<td>Germany</td>
+<td>5.68</td>
+<td>10.00</td>
+<td>Kg</td>
+<td>568.000000</td>
+</tr>
+<tr>
+<th>12</th>
+<td>2019</td>
+<td>United Arab Emirates</td>
+<td>13.18</td>
+<td>7.00</td>
+<td>Kg</td>
+<td>1882.857143</td>
+</tr>
+<tr>
+<th>14</th>
+<td>2019</td>
+<td>Greece</td>
+<td>8.18</td>
+<td>6.00</td>
+<td>Kg</td>
+<td>1363.333333</td>
+</tr>
+<tr>
+<th>17</th>
+<td>2019</td>
+<td>Belgium</td>
+<td>0.04</td>
+<td>1.00</td>
+<td>Kg</td>
+<td>40.000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [546]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_19</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">data_19</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span>
-<span class="n">data_20</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">data_20</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span>
-<span class="n">data_21</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">data_21</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span>
-<span class="n">data_22</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">data_22</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span>
-<span class="n">data_23</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">data_23</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_20</span>
 </pre></div>
 </div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[546]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Year</th>
+<th>From</th>
+<th>value in 1000$</th>
+<th>Quantity</th>
+<th>Quantity Unit</th>
+<th>Cost per kg</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>2020</td>
+<td>World</td>
+<td>2614.27</td>
+<td>100010</td>
+<td>Kg</td>
+<td>26.140086</td>
+</tr>
+<tr>
+<th>5</th>
+<td>2020</td>
+<td>China</td>
+<td>67.59</td>
+<td>43200</td>
+<td>Kg</td>
+<td>1.564583</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2020</td>
+<td>Spain</td>
+<td>1786.99</td>
+<td>18965</td>
+<td>Kg</td>
+<td>94.225679</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2020</td>
+<td>Afghanistan</td>
+<td>93.03</td>
+<td>11177</td>
+<td>Kg</td>
+<td>8.323343</td>
+</tr>
+<tr>
+<th>7</th>
+<td>2020</td>
+<td>Portugal</td>
+<td>30.27</td>
+<td>7755</td>
+<td>Kg</td>
+<td>3.903288</td>
+</tr>
+<tr>
+<th>8</th>
+<td>2020</td>
+<td>Netherlands</td>
+<td>25.05</td>
+<td>6528</td>
+<td>Kg</td>
+<td>3.837316</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2020</td>
+<td>Iran, Islamic Rep.</td>
+<td>311.68</td>
+<td>3389</td>
+<td>Kg</td>
+<td>91.968132</td>
+</tr>
+<tr>
+<th>10</th>
+<td>2020</td>
+<td>Ireland</td>
+<td>12.77</td>
+<td>3334</td>
+<td>Kg</td>
+<td>3.830234</td>
+</tr>
+<tr>
+<th>13</th>
+<td>2020</td>
+<td>India</td>
+<td>6.19</td>
+<td>2000</td>
+<td>Kg</td>
+<td>3.095000</td>
+</tr>
+<tr>
+<th>3</th>
+<td>2020</td>
+<td>France</td>
+<td>175.59</td>
+<td>1995</td>
+<td>Kg</td>
+<td>88.015038</td>
+</tr>
+<tr>
+<th>6</th>
+<td>2020</td>
+<td>Italy</td>
+<td>63.71</td>
+<td>895</td>
+<td>Kg</td>
+<td>71.184358</td>
+</tr>
+<tr>
+<th>14</th>
+<td>2020</td>
+<td>Ghana</td>
+<td>1.15</td>
+<td>500</td>
+<td>Kg</td>
+<td>2.300000</td>
+</tr>
+<tr>
+<th>16</th>
+<td>2020</td>
+<td>Belgium</td>
+<td>0.28</td>
+<td>94</td>
+<td>Kg</td>
+<td>2.978723</td>
+</tr>
+<tr>
+<th>12</th>
+<td>2020</td>
+<td>Poland</td>
+<td>8.78</td>
+<td>79</td>
+<td>Kg</td>
+<td>111.139241</td>
+</tr>
+<tr>
+<th>15</th>
+<td>2020</td>
+<td>Romania</td>
+<td>0.90</td>
+<td>57</td>
+<td>Kg</td>
+<td>15.789474</td>
+</tr>
+<tr>
+<th>11</th>
+<td>2020</td>
+<td>United Arab Emirates</td>
+<td>11.35</td>
+<td>23</td>
+<td>Kg</td>
+<td>493.478261</td>
+</tr>
+<tr>
+<th>9</th>
+<td>2020</td>
+<td>Greece</td>
+<td>18.91</td>
+<td>18</td>
+<td>Kg</td>
+<td>1050.555556</td>
+</tr>
+<tr>
+<th>17</th>
+<td>2020</td>
+<td>Sweden</td>
+<td>0.05</td>
+<td>1</td>
+<td>Kg</td>
+<td>50.000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [547]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_23</span><span class="p">[</span><span class="s1">'Cost_per_kg'</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_23</span><span class="p">[</span><span class="s1">'value'</span><span class="p">]</span> <span class="o">/</span> <span class="n">data_23</span><span class="p">[</span><span class="s1">'Quantity'</span><span class="p">]</span>
-<span class="n">data_23</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_21</span>
 </pre></div>
 </div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[547]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Year</th>
+<th>From</th>
+<th>value in 1000$</th>
+<th>Quantity</th>
+<th>Quantity Unit</th>
+<th>Cost per kg</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>2021</td>
+<td>World</td>
+<td>2737.22</td>
+<td>76572</td>
+<td>Kg</td>
+<td>35.747009</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2021</td>
+<td>India</td>
+<td>91.67</td>
+<td>31984</td>
+<td>Kg</td>
+<td>2.866121</td>
+</tr>
+<tr>
+<th>8</th>
+<td>2021</td>
+<td>Netherlands</td>
+<td>48.52</td>
+<td>9844</td>
+<td>Kg</td>
+<td>4.928891</td>
+</tr>
+<tr>
+<th>6</th>
+<td>2021</td>
+<td>Ireland</td>
+<td>60.40</td>
+<td>9124</td>
+<td>Kg</td>
+<td>6.619904</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2021</td>
+<td>Spain</td>
+<td>1223.95</td>
+<td>7364</td>
+<td>Kg</td>
+<td>166.207224</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2021</td>
+<td>Iran, Islamic Rep.</td>
+<td>876.69</td>
+<td>6815</td>
+<td>Kg</td>
+<td>128.641233</td>
+</tr>
+<tr>
+<th>10</th>
+<td>2021</td>
+<td>Portugal</td>
+<td>16.02</td>
+<td>5312</td>
+<td>Kg</td>
+<td>3.015813</td>
+</tr>
+<tr>
+<th>5</th>
+<td>2021</td>
+<td>Afghanistan</td>
+<td>65.42</td>
+<td>3805</td>
+<td>Kg</td>
+<td>17.193167</td>
+</tr>
+<tr>
+<th>7</th>
+<td>2021</td>
+<td>Italy</td>
+<td>59.21</td>
+<td>1976</td>
+<td>Kg</td>
+<td>29.964575</td>
+</tr>
+<tr>
+<th>3</th>
+<td>2021</td>
+<td>France</td>
+<td>239.00</td>
+<td>146</td>
+<td>Kg</td>
+<td>1636.986301</td>
+</tr>
+<tr>
+<th>14</th>
+<td>2021</td>
+<td>United States</td>
+<td>3.62</td>
+<td>91</td>
+<td>Kg</td>
+<td>39.780220</td>
+</tr>
+<tr>
+<th>13</th>
+<td>2021</td>
+<td>United Arab Emirates</td>
+<td>8.65</td>
+<td>50</td>
+<td>Kg</td>
+<td>173.000000</td>
+</tr>
+<tr>
+<th>11</th>
+<td>2021</td>
+<td>Poland</td>
+<td>14.74</td>
+<td>30</td>
+<td>Kg</td>
+<td>491.333333</td>
+</tr>
+<tr>
+<th>12</th>
+<td>2021</td>
+<td>Germany</td>
+<td>8.90</td>
+<td>20</td>
+<td>Kg</td>
+<td>445.000000</td>
+</tr>
+<tr>
+<th>9</th>
+<td>2021</td>
+<td>Greece</td>
+<td>17.41</td>
+<td>8</td>
+<td>Kg</td>
+<td>2176.250000</td>
+</tr>
+<tr>
+<th>15</th>
+<td>2021</td>
+<td>Turkey</td>
+<td>2.95</td>
+<td>2</td>
+<td>Kg</td>
+<td>1475.000000</td>
+</tr>
+<tr>
+<th>16</th>
+<td>2021</td>
+<td>Estonia</td>
+<td>0.06</td>
+<td>1</td>
+<td>Kg</td>
+<td>60.000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [548]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="s2">"./uk-imports-data/country_hsproduct2digit_year.dta"</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_stata</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-<span class="n">df</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_22</span>
 </pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[548]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Year</th>
+<th>From</th>
+<th>value in 1000$</th>
+<th>Quantity</th>
+<th>Quantity Unit</th>
+<th>Cost per kg</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>2022</td>
+<td>World</td>
+<td>4519.64</td>
+<td>145421.0</td>
+<td>Kg</td>
+<td>31.079693</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2022</td>
+<td>Spain</td>
+<td>2500.99</td>
+<td>91038.1</td>
+<td>Kg</td>
+<td>27.471905</td>
+</tr>
+<tr>
+<th>6</th>
+<td>2022</td>
+<td>India</td>
+<td>97.30</td>
+<td>30012.0</td>
+<td>Kg</td>
+<td>3.242037</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2022</td>
+<td>Iran, Islamic Rep.</td>
+<td>1063.81</td>
+<td>10991.2</td>
+<td>Kg</td>
+<td>96.787430</td>
+</tr>
+<tr>
+<th>8</th>
+<td>2022</td>
+<td>Ireland</td>
+<td>31.18</td>
+<td>6389.0</td>
+<td>Kg</td>
+<td>4.880263</td>
+</tr>
+<tr>
+<th>10</th>
+<td>2022</td>
+<td>Germany</td>
+<td>22.23</td>
+<td>2093.0</td>
+<td>Kg</td>
+<td>10.621118</td>
+</tr>
+<tr>
+<th>12</th>
+<td>2022</td>
+<td>China</td>
+<td>5.85</td>
+<td>2080.0</td>
+<td>Kg</td>
+<td>2.812500</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2022</td>
+<td>Afghanistan</td>
+<td>216.23</td>
+<td>1110.0</td>
+<td>Kg</td>
+<td>194.801802</td>
+</tr>
+<tr>
+<th>5</th>
+<td>2022</td>
+<td>Greece</td>
+<td>132.59</td>
+<td>643.0</td>
+<td>Kg</td>
+<td>206.205288</td>
+</tr>
+<tr>
+<th>3</th>
+<td>2022</td>
+<td>France</td>
+<td>301.25</td>
+<td>449.0</td>
+<td>Kg</td>
+<td>670.935412</td>
+</tr>
+<tr>
+<th>7</th>
+<td>2022</td>
+<td>United Arab Emirates</td>
+<td>96.18</td>
+<td>325.0</td>
+<td>Kg</td>
+<td>295.938462</td>
+</tr>
+<tr>
+<th>9</th>
+<td>2022</td>
+<td>Austria</td>
+<td>24.54</td>
+<td>216.0</td>
+<td>Kg</td>
+<td>113.611111</td>
+</tr>
+<tr>
+<th>11</th>
+<td>2022</td>
+<td>Italy</td>
+<td>17.83</td>
+<td>35.0</td>
+<td>Kg</td>
+<td>509.428571</td>
+</tr>
+<tr>
+<th>14</th>
+<td>2022</td>
+<td>Netherlands</td>
+<td>2.41</td>
+<td>32.0</td>
+<td>Kg</td>
+<td>75.312500</td>
+</tr>
+<tr>
+<th>13</th>
+<td>2022</td>
+<td>Denmark</td>
+<td>3.39</td>
+<td>5.0</td>
+<td>Kg</td>
+<td>678.000000</td>
+</tr>
+<tr>
+<th>16</th>
+<td>2022</td>
+<td>Turkey</td>
+<td>1.63</td>
+<td>2.0</td>
+<td>Kg</td>
+<td>815.000000</td>
+</tr>
+<tr>
+<th>15</th>
+<td>2022</td>
+<td>Portugal</td>
+<td>2.24</td>
+<td>1.0</td>
+<td>Kg</td>
+<td>2240.000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [549]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_23</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[549]:</div>
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Year</th>
+<th>From</th>
+<th>value in 1000$</th>
+<th>Quantity</th>
+<th>Quantity Unit</th>
+<th>Cost per kg</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>2023</td>
+<td>World</td>
+<td>5124.91</td>
+<td>145623.00</td>
+<td>Kg</td>
+<td>35.192998</td>
+</tr>
+<tr>
+<th>1</th>
+<td>2023</td>
+<td>Spain</td>
+<td>2610.37</td>
+<td>84632.00</td>
+<td>Kg</td>
+<td>30.843771</td>
+</tr>
+<tr>
+<th>5</th>
+<td>2023</td>
+<td>India</td>
+<td>153.89</td>
+<td>36605.00</td>
+<td>Kg</td>
+<td>4.204070</td>
+</tr>
+<tr>
+<th>2</th>
+<td>2023</td>
+<td>Iran, Islamic Rep.</td>
+<td>1408.49</td>
+<td>11229.80</td>
+<td>Kg</td>
+<td>125.424317</td>
+</tr>
+<tr>
+<th>9</th>
+<td>2023</td>
+<td>Ireland</td>
+<td>21.64</td>
+<td>5258.00</td>
+<td>Kg</td>
+<td>4.115633</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2023</td>
+<td>Afghanistan</td>
+<td>208.67</td>
+<td>4015.26</td>
+<td>Kg</td>
+<td>51.969237</td>
+</tr>
+<tr>
+<th>8</th>
+<td>2023</td>
+<td>China</td>
+<td>59.88</td>
+<td>1469.00</td>
+<td>Kg</td>
+<td>40.762423</td>
+</tr>
+<tr>
+<th>14</th>
+<td>2023</td>
+<td>Nigeria</td>
+<td>5.10</td>
+<td>1067.00</td>
+<td>Kg</td>
+<td>4.779756</td>
+</tr>
+<tr>
+<th>3</th>
+<td>2023</td>
+<td>France</td>
+<td>362.83</td>
+<td>599.00</td>
+<td>Kg</td>
+<td>605.726210</td>
+</tr>
+<tr>
+<th>6</th>
+<td>2023</td>
+<td>United Arab Emirates</td>
+<td>145.79</td>
+<td>291.00</td>
+<td>Kg</td>
+<td>500.996564</td>
+</tr>
+<tr>
+<th>7</th>
+<td>2023</td>
+<td>Greece</td>
+<td>108.15</td>
+<td>134.00</td>
+<td>Kg</td>
+<td>807.089552</td>
+</tr>
+<tr>
+<th>10</th>
+<td>2023</td>
+<td>Germany</td>
+<td>15.61</td>
+<td>123.00</td>
+<td>Kg</td>
+<td>126.910569</td>
+</tr>
+<tr>
+<th>11</th>
+<td>2023</td>
+<td>United Kingdom</td>
+<td>11.43</td>
+<td>86.00</td>
+<td>Kg</td>
+<td>132.906977</td>
+</tr>
+<tr>
+<th>13</th>
+<td>2023</td>
+<td>Japan</td>
+<td>5.13</td>
+<td>68.00</td>
+<td>Kg</td>
+<td>75.441176</td>
+</tr>
+<tr>
+<th>12</th>
+<td>2023</td>
+<td>United States</td>
+<td>6.68</td>
+<td>45.00</td>
+<td>Kg</td>
+<td>148.444444</td>
+</tr>
+<tr>
+<th>15</th>
+<td>2023</td>
+<td>Turkey</td>
+<td>1.24</td>
+<td>1.00</td>
+<td>Kg</td>
+<td>1240.000000</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 </div>
 </div>
@@ -7676,7 +8600,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [97]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [550]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">map_country_codes</span><span class="p">(</span><span class="n">country_codes_path</span><span class="p">):</span>
@@ -7688,18 +8612,45 @@ a.anchor-link {
     
     <span class="k">return</span> <span class="n">country_codes_map</span>
 
-<span class="k">def</span> <span class="nf">get_saffron_imports</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">country_codes_map</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_saffron_imports</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">country_codes_map</span><span class="p">,</span> <span class="n">sort_by</span><span class="o">=</span><span class="s2">"quantity in tons"</span><span class="p">):</span>
     <span class="n">df_baci</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span>
 
-    <span class="n">df_baci</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"t"</span><span class="p">:</span> <span class="s2">"year"</span><span class="p">,</span> <span class="s2">"i"</span><span class="p">:</span> <span class="s2">"exporter"</span><span class="p">,</span> <span class="s2">"j"</span><span class="p">:</span> <span class="s2">"importer"</span><span class="p">,</span> <span class="s2">"k"</span><span class="p">:</span> <span class="s2">"product"</span><span class="p">,</span> <span class="s2">"v"</span><span class="p">:</span> <span class="s2">"value"</span><span class="p">,</span> <span class="s2">"q"</span><span class="p">:</span> <span class="s2">"quantity"</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df_baci</span> <span class="o">=</span> <span class="n">df_baci</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">df_baci</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"t"</span><span class="p">:</span> <span class="s2">"year"</span><span class="p">,</span> <span class="s2">"i"</span><span class="p">:</span> <span class="s2">"exporter"</span><span class="p">,</span> <span class="s2">"j"</span><span class="p">:</span> <span class="s2">"importer"</span><span class="p">,</span> <span class="s2">"k"</span><span class="p">:</span> <span class="s2">"product"</span><span class="p">,</span> <span class="s2">"v"</span><span class="p">:</span> <span class="s2">"value $"</span><span class="p">,</span> <span class="s2">"q"</span><span class="p">:</span> <span class="s2">"quantity in tons"</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
 
     <span class="n">saffron_data</span> <span class="o">=</span> <span class="n">df_baci</span><span class="p">[</span><span class="n">df_baci</span><span class="p">[</span><span class="s1">'product'</span><span class="p">]</span> <span class="o">==</span> <span class="mi">91020</span><span class="p">]</span> <span class="c1">#saffron code is 91020</span>
-    <span class="n">saffron_data_uk</span> <span class="o">=</span> <span class="n">saffron_data</span><span class="p">[</span><span class="n">saffron_data</span><span class="p">[</span><span class="s1">'importer'</span><span class="p">]</span> <span class="o">==</span> <span class="mi">826</span><span class="p">]</span> <span class="c1">#uk code 826</span>
+    <span class="n">saffron_data_uk</span> <span class="o">=</span> <span class="n">saffron_data</span><span class="p">[</span><span class="n">saffron_data</span><span class="p">[</span><span class="s1">'importer'</span><span class="p">]</span> <span class="o">==</span> <span class="mi">826</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="c1">#uk code 826</span>
+    
+    <span class="n">saffron_data_uk</span><span class="p">[</span><span class="s2">"exporter"</span><span class="p">]</span> <span class="o">=</span> <span class="n">saffron_data_uk</span><span class="p">[</span><span class="s2">"exporter"</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+
+    <span class="n">rows_to_drop</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">saffron_data_uk</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-        <span class="n">saffron_data_uk</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">"exporter"</span><span class="p">]</span> <span class="o">=</span> <span class="n">country_codes_map</span><span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="s2">"exporter"</span><span class="p">]]</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">"exporter"</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">country_codes_map</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">"NA"</span> <span class="ow">in</span> <span class="n">r</span><span class="p">[</span><span class="s2">"quantity in tons"</span><span class="p">]):</span>
+            <span class="n">rows_to_drop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">saffron_data_uk</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s2">"exporter"</span><span class="p">]</span> <span class="o">=</span> <span class="n">country_codes_map</span><span class="p">[</span><span class="n">code</span><span class="p">]</span>
+        
+
+
+    <span class="n">saffron_data_uk</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">rows_to_drop</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">saffron_data_uk</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">saffron_data_uk</span><span class="p">,</span> 
+                        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'product'</span><span class="p">,</span> <span class="s1">'importer'</span><span class="p">])</span>
     
-    <span class="k">return</span> <span class="n">saffron_data_uk</span>
+    <span class="n">saffron_data_uk</span> <span class="o">=</span> <span class="n">saffron_data_uk</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">sort_by</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">saffron_data_uk</span><span class="p">[</span><span class="s1">'quantity in tons'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">saffron_data_uk</span><span class="p">[</span><span class="s1">'quantity in tons'</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">'coerce'</span><span class="p">)</span>
+    
+    <span class="n">saffron_data_uk</span><span class="p">[</span><span class="s1">'value $'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">saffron_data_uk</span><span class="p">[</span><span class="s1">'value $'</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">'coerce'</span><span class="p">)</span>
+
+    <span class="n">saffron_data_uk</span><span class="p">[</span><span class="s1">'average per kg'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">saffron_data_uk</span><span class="p">[</span><span class="s1">'value $'</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">saffron_data_uk</span><span class="p">[</span><span class="s1">'quantity in tons'</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+
+    <span class="n">result_df</span> <span class="o">=</span> <span class="n">saffron_data_uk</span><span class="p">[[</span><span class="s1">'exporter'</span><span class="p">,</span> <span class="s1">'value $'</span><span class="p">,</span> <span class="s1">'quantity in tons'</span><span class="p">,</span> <span class="s1">'average per kg'</span><span class="p">]]</span>
+    <span class="n">result_df</span> <span class="o">=</span> <span class="n">result_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">sort_by</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">result_df</span>
 </pre></div>
 </div>
 </div>
@@ -7710,7 +8661,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [551]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">country_codes_path</span> <span class="o">=</span> <span class="s2">"./baci_data/country_codes_V202401b.csv"</span>
@@ -7741,7 +8692,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Raw export data into UK, value in 1000 usd, quantity in tons... importer 826 is uk, code 91020 is saffron</p>
+<p>saffron import data into UK 2022, value in 100 usd, quantity in tons... importer 826 is uk, code 91020 is saffron</p>
 </div>
 </div>
 </div>
@@ -7750,7 +8701,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [101]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [552]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2022</span>
@@ -7764,7 +8715,7 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[101]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[552]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -7784,1794 +8735,82 @@ a.anchor-link {
 <thead>
 <tr style="text-align: right;">
 <th></th>
-<th>year</th>
 <th>exporter</th>
-<th>importer</th>
-<th>product</th>
-<th>value</th>
-<th>quantity</th>
+<th>value $</th>
+<th>quantity in tons</th>
+<th>average per kg</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<th>5197</th>
-<td>2022</td>
-<td>Afghanistan</td>
-<td>826</td>
-<td>91020</td>
-<td>216.225</td>
-<td>1.110</td>
-</tr>
-<tr>
-<th>446153</th>
-<td>2022</td>
-<td>Austria</td>
-<td>826</td>
-<td>91020</td>
-<td>24.543</td>
-<td>0.039</td>
-</tr>
-<tr>
-<th>477852</th>
-<td>2022</td>
-<td>Bahrain</td>
-<td>826</td>
-<td>91020</td>
-<td>0.064</td>
-<td>NA</td>
-</tr>
-<tr>
-<th>801746</th>
-<td>2022</td>
-<td>Belgium</td>
-<td>826</td>
-<td>91020</td>
-<td>2.891</td>
-<td>0.682</td>
-</tr>
-<tr>
-<th>1016615</th>
-<td>2022</td>
-<td>Brazil</td>
-<td>826</td>
-<td>91020</td>
-<td>0.468</td>
-<td>0.038</td>
-</tr>
-<tr>
-<th>1452321</th>
-<td>2022</td>
-<td>Sri Lanka</td>
-<td>826</td>
-<td>91020</td>
-<td>0.276</td>
-<td>0.063</td>
-</tr>
-<tr>
-<th>2010462</th>
-<td>2022</td>
-<td>China</td>
-<td>826</td>
-<td>91020</td>
-<td>5.842</td>
-<td>2.080</td>
-</tr>
-<tr>
-<th>2595440</th>
-<td>2022</td>
-<td>Denmark</td>
-<td>826</td>
-<td>91020</td>
-<td>2.797</td>
-<td>0.006</td>
-</tr>
-<tr>
-<th>3247517</th>
-<td>2022</td>
-<td>France</td>
-<td>826</td>
-<td>91020</td>
-<td>605.306</td>
-<td>0.981</td>
-</tr>
-<tr>
-<th>3684513</th>
-<td>2022</td>
-<td>Germany</td>
-<td>826</td>
-<td>91020</td>
-<td>29.832</td>
-<td>0.037</td>
-</tr>
-<tr>
-<th>3822296</th>
-<td>2022</td>
-<td>Greece</td>
-<td>826</td>
-<td>91020</td>
-<td>132.593</td>
-<td>0.159</td>
-</tr>
-<tr>
-<th>4156318</th>
-<td>2022</td>
-<td>Hungary</td>
-<td>826</td>
-<td>91020</td>
-<td>0.006</td>
-<td>NA</td>
-</tr>
-<tr>
-<th>4178256</th>
-<td>2022</td>
-<td>Iceland</td>
-<td>826</td>
-<td>91020</td>
-<td>0.010</td>
-<td>NA</td>
+<th>9154176</th>
+<td>Spain</td>
+<td>2634.433</td>
+<td>19.930</td>
+<td>132.184295</td>
 </tr>
 <tr>
 <th>4330419</th>
-<td>2022</td>
 <td>Iran</td>
-<td>826</td>
-<td>91020</td>
 <td>1063.810</td>
 <td>10.991</td>
-</tr>
-<tr>
-<th>4425032</th>
-<td>2022</td>
-<td>Ireland</td>
-<td>826</td>
-<td>91020</td>
-<td>31.797</td>
-<td>0.043</td>
-</tr>
-<tr>
-<th>4856318</th>
-<td>2022</td>
-<td>Italy</td>
-<td>826</td>
-<td>91020</td>
-<td>36.038</td>
-<td>0.028</td>
-</tr>
-<tr>
-<th>5459263</th>
-<td>2022</td>
-<td>Lebanon</td>
-<td>826</td>
-<td>91020</td>
-<td>0.369</td>
-<td>0.001</td>
-</tr>
-<tr>
-<th>6700144</th>
-<td>2022</td>
-<td>Netherlands</td>
-<td>826</td>
-<td>91020</td>
-<td>2.296</td>
-<td>0.038</td>
-</tr>
-<tr>
-<th>7357742</th>
-<td>2022</td>
-<td>Poland</td>
-<td>826</td>
-<td>91020</td>
-<td>19.559</td>
-<td>0.064</td>
-</tr>
-<tr>
-<th>7524477</th>
-<td>2022</td>
-<td>Portugal</td>
-<td>826</td>
-<td>91020</td>
-<td>2.870</td>
-<td>0.495</td>
-</tr>
-<tr>
-<th>7665235</th>
-<td>2022</td>
-<td>Romania</td>
-<td>826</td>
-<td>91020</td>
-<td>20.472</td>
-<td>0.006</td>
+<td>96.789191</td>
 </tr>
 <tr>
 <th>8197273</th>
-<td>2022</td>
 <td>India</td>
-<td>826</td>
-<td>91020</td>
 <td>67.383</td>
 <td>5.971</td>
+<td>11.285044</td>
 </tr>
 <tr>
-<th>8833236</th>
-<td>2022</td>
-<td>South Africa</td>
-<td>826</td>
-<td>91020</td>
-<td>0.355</td>
-<td>0.103</td>
+<th>2010462</th>
+<td>China</td>
+<td>5.842</td>
+<td>2.080</td>
+<td>2.808654</td>
 </tr>
 <tr>
-<th>9154176</th>
-<td>2022</td>
-<td>Spain</td>
-<td>826</td>
-<td>91020</td>
-<td>2634.433</td>
-<td>19.930</td>
+<th>5197</th>
+<td>Afghanistan</td>
+<td>216.225</td>
+<td>1.110</td>
+<td>194.797297</td>
 </tr>
 <tr>
-<th>9354287</th>
-<td>2022</td>
-<td>Sweden</td>
-<td>826</td>
-<td>91020</td>
-<td>2.274</td>
-<td>0.058</td>
+<th>3247517</th>
+<td>France</td>
+<td>605.306</td>
+<td>0.981</td>
+<td>617.029562</td>
+</tr>
+<tr>
+<th>801746</th>
+<td>Belgium</td>
+<td>2.891</td>
+<td>0.682</td>
+<td>4.239003</td>
+</tr>
+<tr>
+<th>7524477</th>
+<td>Portugal</td>
+<td>2.870</td>
+<td>0.495</td>
+<td>5.797980</td>
 </tr>
 <tr>
 <th>9974808</th>
-<td>2022</td>
 <td>United Arab Emirates</td>
-<td>826</td>
-<td>91020</td>
 <td>95.593</td>
 <td>0.329</td>
+<td>290.556231</td>
 </tr>
 <tr>
 <th>10348338</th>
-<td>2022</td>
 <td>Türkiye</td>
-<td>826</td>
-<td>91020</td>
 <td>2.855</td>
 <td>0.245</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Raw export data into UK 2021, value in 1000 usd, quantity in tons... importer 826 is uk, code 91020 is saffron</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [102]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2021</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[102]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>year</th>
-<th>exporter</th>
-<th>importer</th>
-<th>product</th>
-<th>value</th>
-<th>quantity</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>5990</th>
-<td>2021</td>
-<td>Afghanistan</td>
-<td>826</td>
-<td>91020</td>
-<td>65.425</td>
-<td>3.805</td>
-</tr>
-<tr>
-<th>446950</th>
-<td>2021</td>
-<td>Austria</td>
-<td>826</td>
-<td>91020</td>
-<td>0.604</td>
-<td>NA</td>
-</tr>
-<tr>
-<th>803353</th>
-<td>2021</td>
-<td>Belgium</td>
-<td>826</td>
-<td>91020</td>
-<td>1.340</td>
-<td>0.002</td>
-</tr>
-<tr>
-<th>1016857</th>
-<td>2021</td>
-<td>Brazil</td>
-<td>826</td>
-<td>91020</td>
-<td>1.454</td>
-<td>0.704</td>
-</tr>
-<tr>
-<th>2426640</th>
-<td>2021</td>
-<td>Czechia</td>
-<td>826</td>
-<td>91020</td>
-<td>0.708</td>
-<td>0.026</td>
-</tr>
-<tr>
-<th>2616642</th>
-<td>2021</td>
-<td>Denmark</td>
-<td>826</td>
-<td>91020</td>
-<td>0.067</td>
-<td>0.001</td>
-</tr>
-<tr>
-<th>2707975</th>
-<td>2021</td>
-<td>Ethiopia</td>
-<td>826</td>
-<td>91020</td>
-<td>0.505</td>
-<td>0.450</td>
-</tr>
-<tr>
-<th>2775802</th>
-<td>2021</td>
-<td>Estonia</td>
-<td>826</td>
-<td>91020</td>
-<td>0.055</td>
-<td>0.001</td>
-</tr>
-<tr>
-<th>3265972</th>
-<td>2021</td>
-<td>France</td>
-<td>826</td>
-<td>91020</td>
-<td>273.021</td>
-<td>6.835</td>
-</tr>
-<tr>
-<th>3314448</th>
-<td>2021</td>
-<td>Georgia</td>
-<td>826</td>
-<td>91020</td>
-<td>0.366</td>
-<td>0.015</td>
-</tr>
-<tr>
-<th>3707802</th>
-<td>2021</td>
-<td>Germany</td>
-<td>826</td>
-<td>91020</td>
-<td>32.985</td>
-<td>0.034</td>
-</tr>
-<tr>
-<th>3844902</th>
-<td>2021</td>
-<td>Greece</td>
-<td>826</td>
-<td>91020</td>
-<td>17.407</td>
-<td>0.020</td>
-</tr>
-<tr>
-<th>4192018</th>
-<td>2021</td>
-<td>Hungary</td>
-<td>826</td>
-<td>91020</td>
-<td>0.007</td>
-<td>NA</td>
-</tr>
-<tr>
-<th>4377744</th>
-<td>2021</td>
-<td>Iran</td>
-<td>826</td>
-<td>91020</td>
-<td>847.352</td>
-<td>3.444</td>
-</tr>
-<tr>
-<th>4473078</th>
-<td>2021</td>
-<td>Ireland</td>
-<td>826</td>
-<td>91020</td>
-<td>57.890</td>
-<td>8.894</td>
-</tr>
-<tr>
-<th>4908628</th>
-<td>2021</td>
-<td>Italy</td>
-<td>826</td>
-<td>91020</td>
-<td>50.917</td>
-<td>0.195</td>
-</tr>
-<tr>
-<th>5525643</th>
-<td>2021</td>
-<td>Lebanon</td>
-<td>826</td>
-<td>91020</td>
-<td>0.367</td>
-<td>0.001</td>
-</tr>
-<tr>
-<th>6757118</th>
-<td>2021</td>
-<td>Netherlands</td>
-<td>826</td>
-<td>91020</td>
-<td>42.444</td>
-<td>5.067</td>
-</tr>
-<tr>
-<th>7413956</th>
-<td>2021</td>
-<td>Poland</td>
-<td>826</td>
-<td>91020</td>
-<td>15.960</td>
-<td>0.113</td>
-</tr>
-<tr>
-<th>7580166</th>
-<td>2021</td>
-<td>Portugal</td>
-<td>826</td>
-<td>91020</td>
-<td>13.083</td>
-<td>1.317</td>
-</tr>
-<tr>
-<th>8320747</th>
-<td>2021</td>
-<td>India</td>
-<td>826</td>
-<td>91020</td>
-<td>65.180</td>
-<td>6.326</td>
-</tr>
-<tr>
-<th>8587015</th>
-<td>2021</td>
-<td>Slovakia</td>
-<td>826</td>
-<td>91020</td>
-<td>0.019</td>
-<td>0.002</td>
-</tr>
-<tr>
-<th>9287748</th>
-<td>2021</td>
-<td>Spain</td>
-<td>826</td>
-<td>91020</td>
-<td>1635.003</td>
-<td>9.432</td>
-</tr>
-<tr>
-<th>9493245</th>
-<td>2021</td>
-<td>Sweden</td>
-<td>826</td>
-<td>91020</td>
-<td>9.328</td>
-<td>0.190</td>
-</tr>
-<tr>
-<th>10115797</th>
-<td>2021</td>
-<td>United Arab Emirates</td>
-<td>826</td>
-<td>91020</td>
-<td>8.788</td>
-<td>0.053</td>
-</tr>
-<tr>
-<th>10483948</th>
-<td>2021</td>
-<td>Türkiye</td>
-<td>826</td>
-<td>91020</td>
-<td>2.929</td>
-<td>0.211</td>
-</tr>
-<tr>
-<th>11030293</th>
-<td>2021</td>
-<td>United Rep. of Tanzania</td>
-<td>826</td>
-<td>91020</td>
-<td>0.010</td>
-<td>0.001</td>
-</tr>
-<tr>
-<th>11432574</th>
-<td>2021</td>
-<td>USA</td>
-<td>826</td>
-<td>91020</td>
-<td>3.624</td>
-<td>0.091</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Raw export data into UK 2020, value in 1000 usd, quantity in tons... importer 826 is uk, code 91020 is saffron</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [103]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2020</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[103]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>year</th>
-<th>exporter</th>
-<th>importer</th>
-<th>product</th>
-<th>value</th>
-<th>quantity</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>4522</th>
-<td>2020</td>
-<td>Afghanistan</td>
-<td>826</td>
-<td>91020</td>
-<td>93.026</td>
-<td>11.177</td>
-</tr>
-<tr>
-<th>416448</th>
-<td>2020</td>
-<td>Austria</td>
-<td>826</td>
-<td>91020</td>
-<td>0.379</td>
-<td>0.001</td>
-</tr>
-<tr>
-<th>756807</th>
-<td>2020</td>
-<td>Belgium</td>
-<td>826</td>
-<td>91020</td>
-<td>2.119</td>
-<td>0.141</td>
-</tr>
-<tr>
-<th>957853</th>
-<td>2020</td>
-<td>Brazil</td>
-<td>826</td>
-<td>91020</td>
-<td>0.267</td>
-<td>0.030</td>
-</tr>
-<tr>
-<th>1925246</th>
-<td>2020</td>
-<td>China</td>
-<td>826</td>
-<td>91020</td>
-<td>67.591</td>
-<td>43.200</td>
-</tr>
-<tr>
-<th>2304215</th>
-<td>2020</td>
-<td>Czechia</td>
-<td>826</td>
-<td>91020</td>
-<td>1.145</td>
-<td>0.001</td>
-</tr>
-<tr>
-<th>3107328</th>
-<td>2020</td>
-<td>France</td>
-<td>826</td>
-<td>91020</td>
-<td>179.776</td>
-<td>1.566</td>
-</tr>
-<tr>
-<th>3547679</th>
-<td>2020</td>
-<td>Germany</td>
-<td>826</td>
-<td>91020</td>
-<td>7.012</td>
-<td>0.004</td>
-</tr>
-<tr>
-<th>3576253</th>
-<td>2020</td>
-<td>Ghana</td>
-<td>826</td>
-<td>91020</td>
-<td>1.145</td>
-<td>0.500</td>
-</tr>
-<tr>
-<th>3676432</th>
-<td>2020</td>
-<td>Greece</td>
-<td>826</td>
-<td>91020</td>
-<td>24.320</td>
-<td>0.033</td>
-</tr>
-<tr>
-<th>4010986</th>
-<td>2020</td>
-<td>Hungary</td>
-<td>826</td>
-<td>91020</td>
-<td>0.065</td>
-<td>0.005</td>
-</tr>
-<tr>
-<th>4184128</th>
-<td>2020</td>
-<td>Iran</td>
-<td>826</td>
-<td>91020</td>
-<td>320.420</td>
-<td>0.663</td>
-</tr>
-<tr>
-<th>4268626</th>
-<td>2020</td>
-<td>Ireland</td>
-<td>826</td>
-<td>91020</td>
-<td>12.084</td>
-<td>3.227</td>
-</tr>
-<tr>
-<th>4689399</th>
-<td>2020</td>
-<td>Italy</td>
-<td>826</td>
-<td>91020</td>
-<td>48.192</td>
-<td>1.197</td>
-</tr>
-<tr>
-<th>6440988</th>
-<td>2020</td>
-<td>Netherlands</td>
-<td>826</td>
-<td>91020</td>
-<td>21.703</td>
-<td>3.341</td>
-</tr>
-<tr>
-<th>7079932</th>
-<td>2020</td>
-<td>Poland</td>
-<td>826</td>
-<td>91020</td>
-<td>9.353</td>
-<td>0.019</td>
-</tr>
-<tr>
-<th>7237533</th>
-<td>2020</td>
-<td>Portugal</td>
-<td>826</td>
-<td>91020</td>
-<td>22.844</td>
-<td>7.755</td>
-</tr>
-<tr>
-<th>7366648</th>
-<td>2020</td>
-<td>Romania</td>
-<td>826</td>
-<td>91020</td>
-<td>0.772</td>
-<td>0.012</td>
-</tr>
-<tr>
-<th>7908166</th>
-<td>2020</td>
-<td>India</td>
-<td>826</td>
-<td>91020</td>
-<td>14.247</td>
-<td>6.080</td>
-</tr>
-<tr>
-<th>8283839</th>
-<td>2020</td>
-<td>Viet Nam</td>
-<td>826</td>
-<td>91020</td>
-<td>0.875</td>
-<td>0.001</td>
-</tr>
-<tr>
-<th>8833754</th>
-<td>2020</td>
-<td>Spain</td>
-<td>826</td>
-<td>91020</td>
-<td>2126.049</td>
-<td>8.792</td>
-</tr>
-<tr>
-<th>9027392</th>
-<td>2020</td>
-<td>Sweden</td>
-<td>826</td>
-<td>91020</td>
-<td>0.298</td>
-<td>0.001</td>
-</tr>
-<tr>
-<th>9618798</th>
-<td>2020</td>
-<td>United Arab Emirates</td>
-<td>826</td>
-<td>91020</td>
-<td>11.289</td>
-<td>0.025</td>
-</tr>
-<tr>
-<th>10901266</th>
-<td>2020</td>
-<td>Uruguay</td>
-<td>826</td>
-<td>91020</td>
-<td>0.193</td>
-<td>0.029</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Raw export data into UK 2019, value in 1000 usd, quantity in tons... importer 826 is uk, code 91020 is saffron</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [104]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2019</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[104]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>year</th>
-<th>exporter</th>
-<th>importer</th>
-<th>product</th>
-<th>value</th>
-<th>quantity</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>4037</th>
-<td>2019</td>
-<td>Afghanistan</td>
-<td>826</td>
-<td>91020</td>
-<td>16.360</td>
-<td>2.056</td>
-</tr>
-<tr>
-<th>428395</th>
-<td>2019</td>
-<td>Austria</td>
-<td>826</td>
-<td>91020</td>
-<td>0.111</td>
-<td>NA</td>
-</tr>
-<tr>
-<th>777080</th>
-<td>2019</td>
-<td>Belgium</td>
-<td>826</td>
-<td>91020</td>
-<td>0.649</td>
-<td>0.037</td>
-</tr>
-<tr>
-<th>980079</th>
-<td>2019</td>
-<td>Brazil</td>
-<td>826</td>
-<td>91020</td>
-<td>4.920</td>
-<td>0.047</td>
-</tr>
-<tr>
-<th>1415691</th>
-<td>2019</td>
-<td>Sri Lanka</td>
-<td>826</td>
-<td>91020</td>
-<td>19.530</td>
-<td>11.520</td>
-</tr>
-<tr>
-<th>1972818</th>
-<td>2019</td>
-<td>China</td>
-<td>826</td>
-<td>91020</td>
-<td>442.190</td>
-<td>NA</td>
-</tr>
-<tr>
-<th>2359594</th>
-<td>2019</td>
-<td>Czechia</td>
-<td>826</td>
-<td>91020</td>
-<td>0.540</td>
-<td>0.079</td>
-</tr>
-<tr>
-<th>3180887</th>
-<td>2019</td>
-<td>France</td>
-<td>826</td>
-<td>91020</td>
-<td>308.228</td>
-<td>0.286</td>
-</tr>
-<tr>
-<th>3629571</th>
-<td>2019</td>
-<td>Germany</td>
-<td>826</td>
-<td>91020</td>
-<td>10.847</td>
-<td>0.006</td>
-</tr>
-<tr>
-<th>3766737</th>
-<td>2019</td>
-<td>Greece</td>
-<td>826</td>
-<td>91020</td>
-<td>12.149</td>
-<td>0.014</td>
-</tr>
-<tr>
-<th>4114564</th>
-<td>2019</td>
-<td>Hungary</td>
-<td>826</td>
-<td>91020</td>
-<td>0.061</td>
-<td>NA</td>
-</tr>
-<tr>
-<th>4295122</th>
-<td>2019</td>
-<td>Iran</td>
-<td>826</td>
-<td>91020</td>
-<td>472.360</td>
-<td>0.377</td>
-</tr>
-<tr>
-<th>4378684</th>
-<td>2019</td>
-<td>Ireland</td>
-<td>826</td>
-<td>91020</td>
-<td>18.141</td>
-<td>2.392</td>
-</tr>
-<tr>
-<th>4810576</th>
-<td>2019</td>
-<td>Italy</td>
-<td>826</td>
-<td>91020</td>
-<td>69.315</td>
-<td>1.081</td>
-</tr>
-<tr>
-<th>6222947</th>
-<td>2019</td>
-<td>Morocco</td>
-<td>826</td>
-<td>91020</td>
-<td>2.600</td>
-<td>0.001</td>
-</tr>
-<tr>
-<th>6234994</th>
-<td>2019</td>
-<td>Mozambique</td>
-<td>826</td>
-<td>91020</td>
-<td>0.029</td>
-<td>0.017</td>
-</tr>
-<tr>
-<th>6608339</th>
-<td>2019</td>
-<td>Netherlands</td>
-<td>826</td>
-<td>91020</td>
-<td>13.801</td>
-<td>2.502</td>
-</tr>
-<tr>
-<th>7265929</th>
-<td>2019</td>
-<td>Poland</td>
-<td>826</td>
-<td>91020</td>
-<td>38.643</td>
-<td>3.877</td>
-</tr>
-<tr>
-<th>7425168</th>
-<td>2019</td>
-<td>Portugal</td>
-<td>826</td>
-<td>91020</td>
-<td>26.341</td>
-<td>NA</td>
-</tr>
-<tr>
-<th>7555247</th>
-<td>2019</td>
-<td>Romania</td>
-<td>826</td>
-<td>91020</td>
-<td>0.376</td>
-<td>0.029</td>
-</tr>
-<tr>
-<th>8112418</th>
-<td>2019</td>
-<td>India</td>
-<td>826</td>
-<td>91020</td>
-<td>13.483</td>
-<td>0.614</td>
-</tr>
-<tr>
-<th>9061907</th>
-<td>2019</td>
-<td>Spain</td>
-<td>826</td>
-<td>91020</td>
-<td>2484.830</td>
-<td>67.672</td>
-</tr>
-<tr>
-<th>9259335</th>
-<td>2019</td>
-<td>Sweden</td>
-<td>826</td>
-<td>91020</td>
-<td>0.529</td>
-<td>0.001</td>
-</tr>
-<tr>
-<th>9872320</th>
-<td>2019</td>
-<td>United Arab Emirates</td>
-<td>826</td>
-<td>91020</td>
-<td>13.176</td>
-<td>0.013</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Raw export data into UK 2018, value in 1000 usd, quantity in tons... importer 826 is uk, code 91020 is saffron</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [105]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2018</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[105]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>year</th>
-<th>exporter</th>
-<th>importer</th>
-<th>product</th>
-<th>value</th>
-<th>quantity</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>3600</th>
-<td>2018</td>
-<td>Afghanistan</td>
-<td>826</td>
-<td>91020</td>
-<td>1.301</td>
-<td>0.039</td>
-</tr>
-<tr>
-<th>414655</th>
-<td>2018</td>
-<td>Austria</td>
-<td>826</td>
-<td>91020</td>
-<td>0.250</td>
-<td>NA</td>
-</tr>
-<tr>
-<th>749450</th>
-<td>2018</td>
-<td>Belgium</td>
-<td>826</td>
-<td>91020</td>
-<td>0.233</td>
-<td>0.022</td>
-</tr>
-<tr>
-<th>937744</th>
-<td>2018</td>
-<td>Brazil</td>
-<td>826</td>
-<td>91020</td>
-<td>0.035</td>
-<td>0.006</td>
-</tr>
-<tr>
-<th>1878304</th>
-<td>2018</td>
-<td>China</td>
-<td>826</td>
-<td>91020</td>
-<td>536.375</td>
-<td>18.219</td>
-</tr>
-<tr>
-<th>2259608</th>
-<td>2018</td>
-<td>Czechia</td>
-<td>826</td>
-<td>91020</td>
-<td>0.783</td>
-<td>0.101</td>
-</tr>
-<tr>
-<th>3054927</th>
-<td>2018</td>
-<td>France</td>
-<td>826</td>
-<td>91020</td>
-<td>256.304</td>
-<td>0.219</td>
-</tr>
-<tr>
-<th>3493692</th>
-<td>2018</td>
-<td>Germany</td>
-<td>826</td>
-<td>91020</td>
-<td>9.099</td>
-<td>0.061</td>
-</tr>
-<tr>
-<th>3624698</th>
-<td>2018</td>
-<td>Greece</td>
-<td>826</td>
-<td>91020</td>
-<td>28.161</td>
-<td>0.018</td>
-</tr>
-<tr>
-<th>3959419</th>
-<td>2018</td>
-<td>Hungary</td>
-<td>826</td>
-<td>91020</td>
-<td>0.057</td>
-<td>NA</td>
-</tr>
-<tr>
-<th>4136550</th>
-<td>2018</td>
-<td>Iran</td>
-<td>826</td>
-<td>91020</td>
-<td>579.807</td>
-<td>1.632</td>
-</tr>
-<tr>
-<th>4217374</th>
-<td>2018</td>
-<td>Ireland</td>
-<td>826</td>
-<td>91020</td>
-<td>30.961</td>
-<td>3.176</td>
-</tr>
-<tr>
-<th>4640208</th>
-<td>2018</td>
-<td>Italy</td>
-<td>826</td>
-<td>91020</td>
-<td>114.857</td>
-<td>1.955</td>
-</tr>
-<tr>
-<th>5214430</th>
-<td>2018</td>
-<td>Lebanon</td>
-<td>826</td>
-<td>91020</td>
-<td>1.849</td>
-<td>0.570</td>
-</tr>
-<tr>
-<th>6002108</th>
-<td>2018</td>
-<td>Morocco</td>
-<td>826</td>
-<td>91020</td>
-<td>2.051</td>
-<td>0.001</td>
-</tr>
-<tr>
-<th>6372916</th>
-<td>2018</td>
-<td>Netherlands</td>
-<td>826</td>
-<td>91020</td>
-<td>2.348</td>
-<td>0.162</td>
-</tr>
-<tr>
-<th>6998246</th>
-<td>2018</td>
-<td>Poland</td>
-<td>826</td>
-<td>91020</td>
-<td>33.159</td>
-<td>0.724</td>
-</tr>
-<tr>
-<th>7152364</th>
-<td>2018</td>
-<td>Portugal</td>
-<td>826</td>
-<td>91020</td>
-<td>35.460</td>
-<td>4.474</td>
-</tr>
-<tr>
-<th>7279016</th>
-<td>2018</td>
-<td>Romania</td>
-<td>826</td>
-<td>91020</td>
-<td>0.013</td>
-<td>NA</td>
-</tr>
-<tr>
-<th>7816419</th>
-<td>2018</td>
-<td>India</td>
-<td>826</td>
-<td>91020</td>
-<td>25.254</td>
-<td>0.023</td>
-</tr>
-<tr>
-<th>8742769</th>
-<td>2018</td>
-<td>Spain</td>
-<td>826</td>
-<td>91020</td>
-<td>2730.246</td>
-<td>3.522</td>
-</tr>
-<tr>
-<th>8935133</th>
-<td>2018</td>
-<td>Sweden</td>
-<td>826</td>
-<td>91020</td>
-<td>1.727</td>
-<td>0.001</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Raw export data into UK 2017, value in 1000 usd, quantity in tons... importer 826 is uk, code 91020 is saffron</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [106]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2017</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[106]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>year</th>
-<th>exporter</th>
-<th>importer</th>
-<th>product</th>
-<th>value</th>
-<th>quantity</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>2763</th>
-<td>2017</td>
-<td>Afghanistan</td>
-<td>826</td>
-<td>91020</td>
-<td>5.447</td>
-<td>0.006</td>
-</tr>
-<tr>
-<th>384100</th>
-<td>2017</td>
-<td>Austria</td>
-<td>826</td>
-<td>91020</td>
-<td>0.008</td>
-<td>NA</td>
-</tr>
-<tr>
-<th>701855</th>
-<td>2017</td>
-<td>Belgium</td>
-<td>826</td>
-<td>91020</td>
-<td>129.175</td>
-<td>45.176</td>
-</tr>
-<tr>
-<th>1765556</th>
-<td>2017</td>
-<td>China</td>
-<td>826</td>
-<td>91020</td>
-<td>664.238</td>
-<td>0.096</td>
-</tr>
-<tr>
-<th>2128785</th>
-<td>2017</td>
-<td>Czechia</td>
-<td>826</td>
-<td>91020</td>
-<td>0.027</td>
-<td>0.003</td>
-</tr>
-<tr>
-<th>2889820</th>
-<td>2017</td>
-<td>France</td>
-<td>826</td>
-<td>91020</td>
-<td>244.398</td>
-<td>0.432</td>
-</tr>
-<tr>
-<th>3316473</th>
-<td>2017</td>
-<td>Germany</td>
-<td>826</td>
-<td>91020</td>
-<td>1.160</td>
-<td>0.001</td>
-</tr>
-<tr>
-<th>3432367</th>
-<td>2017</td>
-<td>Greece</td>
-<td>826</td>
-<td>91020</td>
-<td>13.599</td>
-<td>0.022</td>
-</tr>
-<tr>
-<th>3746388</th>
-<td>2017</td>
-<td>Hungary</td>
-<td>826</td>
-<td>91020</td>
-<td>0.064</td>
-<td>NA</td>
-</tr>
-<tr>
-<th>3911568</th>
-<td>2017</td>
-<td>Iran</td>
-<td>826</td>
-<td>91020</td>
-<td>699.112</td>
-<td>2.976</td>
-</tr>
-<tr>
-<th>3988104</th>
-<td>2017</td>
-<td>Ireland</td>
-<td>826</td>
-<td>91020</td>
-<td>23.393</td>
-<td>4.204</td>
-</tr>
-<tr>
-<th>4396334</th>
-<td>2017</td>
-<td>Italy</td>
-<td>826</td>
-<td>91020</td>
-<td>88.333</td>
-<td>2.807</td>
-</tr>
-<tr>
-<th>4925324</th>
-<td>2017</td>
-<td>Lebanon</td>
-<td>826</td>
-<td>91020</td>
-<td>1.961</td>
-<td>0.822</td>
-</tr>
-<tr>
-<th>5389443</th>
-<td>2017</td>
-<td>Mexico</td>
-<td>826</td>
-<td>91020</td>
-<td>7.437</td>
-<td>0.767</td>
-</tr>
-<tr>
-<th>6000895</th>
-<td>2017</td>
-<td>Netherlands</td>
-<td>826</td>
-<td>91020</td>
-<td>260.747</td>
-<td>18.950</td>
-</tr>
-<tr>
-<th>6110365</th>
-<td>2017</td>
-<td>Nigeria</td>
-<td>826</td>
-<td>91020</td>
-<td>0.251</td>
-<td>4.550</td>
-</tr>
-<tr>
-<th>6587059</th>
-<td>2017</td>
-<td>Poland</td>
-<td>826</td>
-<td>91020</td>
-<td>7.606</td>
-<td>0.089</td>
-</tr>
-<tr>
-<th>6732711</th>
-<td>2017</td>
-<td>Portugal</td>
-<td>826</td>
-<td>91020</td>
-<td>46.242</td>
-<td>3.530</td>
-</tr>
-<tr>
-<th>6847500</th>
-<td>2017</td>
-<td>Romania</td>
-<td>826</td>
-<td>91020</td>
-<td>0.012</td>
-<td>0.001</td>
-</tr>
-<tr>
-<th>7335652</th>
-<td>2017</td>
-<td>India</td>
-<td>826</td>
-<td>91020</td>
-<td>3.230</td>
-<td>0.016</td>
-</tr>
-<tr>
-<th>8144619</th>
-<td>2017</td>
-<td>Spain</td>
-<td>826</td>
-<td>91020</td>
-<td>3126.319</td>
-<td>30.892</td>
-</tr>
-<tr>
-<th>8331367</th>
-<td>2017</td>
-<td>Sweden</td>
-<td>826</td>
-<td>91020</td>
-<td>1.407</td>
-<td>0.001</td>
-</tr>
-<tr>
-<th>9881670</th>
-<td>2017</td>
-<td>USA</td>
-<td>826</td>
-<td>91020</td>
-<td>3.403</td>
-<td>0.430</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [113]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">calculate_average_price_per_kg</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
-    <span class="n">df</span><span class="p">[</span><span class="s1">'quantity'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'quantity'</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s1">'coerce'</span><span class="p">)</span>
-    <span class="n">df</span><span class="p">[</span><span class="s1">'average_per_kg'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'value'</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">'quantity'</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
-
-    <span class="n">result_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s1">'exporter'</span><span class="p">,</span> <span class="s1">'value'</span><span class="p">,</span> <span class="s1">'quantity'</span><span class="p">,</span> <span class="s1">'average_per_kg'</span><span class="p">]]</span>
-    <span class="n">result_df</span> <span class="o">=</span> <span class="n">result_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">'average_per_kg'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    
-    <span class="k">return</span> <span class="n">result_df</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [115]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2022_df</span> <span class="o">=</span> <span class="n">calculate_average_price_per_kg</span><span class="p">(</span><span class="n">data_saffron_uk_2022</span><span class="p">)</span>
-<span class="n">data_saffron_uk_2021_df</span> <span class="o">=</span> <span class="n">calculate_average_price_per_kg</span><span class="p">(</span><span class="n">data_saffron_uk_2021</span><span class="p">)</span>
-<span class="n">data_saffron_uk_2020_df</span> <span class="o">=</span> <span class="n">calculate_average_price_per_kg</span><span class="p">(</span><span class="n">data_saffron_uk_2020</span><span class="p">)</span>
-<span class="n">data_saffron_uk_2019_df</span> <span class="o">=</span> <span class="n">calculate_average_price_per_kg</span><span class="p">(</span><span class="n">data_saffron_uk_2019</span><span class="p">)</span>
-<span class="n">data_saffron_uk_2018_df</span> <span class="o">=</span> <span class="n">calculate_average_price_per_kg</span><span class="p">(</span><span class="n">data_saffron_uk_2018</span><span class="p">)</span>
-<span class="n">data_saffron_uk_2017_df</span> <span class="o">=</span> <span class="n">calculate_average_price_per_kg</span><span class="p">(</span><span class="n">data_saffron_uk_2017</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>average per kg of imported saffron in the uk, 2022, descending by average</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [116]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2022_df</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[116]:</div>
-<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
-<div>
-<style scoped="">
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-<thead>
-<tr style="text-align: right;">
-<th></th>
-<th>exporter</th>
-<th>value</th>
-<th>quantity</th>
-<th>average_per_kg</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>7665235</th>
-<td>Romania</td>
-<td>20.472</td>
-<td>0.006</td>
-<td>3412.000000</td>
-</tr>
-<tr>
-<th>4856318</th>
-<td>Italy</td>
-<td>36.038</td>
-<td>0.028</td>
-<td>1287.071429</td>
+<td>11.653061</td>
 </tr>
 <tr>
 <th>3822296</th>
@@ -9581,11 +8820,32 @@ a.anchor-link {
 <td>833.918239</td>
 </tr>
 <tr>
-<th>3684513</th>
-<td>Germany</td>
-<td>29.832</td>
-<td>0.037</td>
-<td>806.270270</td>
+<th>8833236</th>
+<td>South Africa</td>
+<td>0.355</td>
+<td>0.103</td>
+<td>3.446602</td>
+</tr>
+<tr>
+<th>7357742</th>
+<td>Poland</td>
+<td>19.559</td>
+<td>0.064</td>
+<td>305.609375</td>
+</tr>
+<tr>
+<th>1452321</th>
+<td>Sri Lanka</td>
+<td>0.276</td>
+<td>0.063</td>
+<td>4.380952</td>
+</tr>
+<tr>
+<th>9354287</th>
+<td>Sweden</td>
+<td>2.274</td>
+<td>0.058</td>
+<td>39.206897</td>
 </tr>
 <tr>
 <th>4425032</th>
@@ -9602,11 +8862,39 @@ a.anchor-link {
 <td>629.307692</td>
 </tr>
 <tr>
-<th>3247517</th>
-<td>France</td>
-<td>605.306</td>
-<td>0.981</td>
-<td>617.029562</td>
+<th>6700144</th>
+<td>Netherlands</td>
+<td>2.296</td>
+<td>0.038</td>
+<td>60.421053</td>
+</tr>
+<tr>
+<th>1016615</th>
+<td>Brazil</td>
+<td>0.468</td>
+<td>0.038</td>
+<td>12.315789</td>
+</tr>
+<tr>
+<th>3684513</th>
+<td>Germany</td>
+<td>29.832</td>
+<td>0.037</td>
+<td>806.270270</td>
+</tr>
+<tr>
+<th>4856318</th>
+<td>Italy</td>
+<td>36.038</td>
+<td>0.028</td>
+<td>1287.071429</td>
+</tr>
+<tr>
+<th>7665235</th>
+<td>Romania</td>
+<td>20.472</td>
+<td>0.006</td>
+<td>3412.000000</td>
 </tr>
 <tr>
 <th>2595440</th>
@@ -9622,132 +8910,6 @@ a.anchor-link {
 <td>0.001</td>
 <td>369.000000</td>
 </tr>
-<tr>
-<th>7357742</th>
-<td>Poland</td>
-<td>19.559</td>
-<td>0.064</td>
-<td>305.609375</td>
-</tr>
-<tr>
-<th>9974808</th>
-<td>United Arab Emirates</td>
-<td>95.593</td>
-<td>0.329</td>
-<td>290.556231</td>
-</tr>
-<tr>
-<th>5197</th>
-<td>Afghanistan</td>
-<td>216.225</td>
-<td>1.110</td>
-<td>194.797297</td>
-</tr>
-<tr>
-<th>9154176</th>
-<td>Spain</td>
-<td>2634.433</td>
-<td>19.930</td>
-<td>132.184295</td>
-</tr>
-<tr>
-<th>4330419</th>
-<td>Iran</td>
-<td>1063.810</td>
-<td>10.991</td>
-<td>96.789191</td>
-</tr>
-<tr>
-<th>6700144</th>
-<td>Netherlands</td>
-<td>2.296</td>
-<td>0.038</td>
-<td>60.421053</td>
-</tr>
-<tr>
-<th>9354287</th>
-<td>Sweden</td>
-<td>2.274</td>
-<td>0.058</td>
-<td>39.206897</td>
-</tr>
-<tr>
-<th>1016615</th>
-<td>Brazil</td>
-<td>0.468</td>
-<td>0.038</td>
-<td>12.315789</td>
-</tr>
-<tr>
-<th>10348338</th>
-<td>Türkiye</td>
-<td>2.855</td>
-<td>0.245</td>
-<td>11.653061</td>
-</tr>
-<tr>
-<th>8197273</th>
-<td>India</td>
-<td>67.383</td>
-<td>5.971</td>
-<td>11.285044</td>
-</tr>
-<tr>
-<th>7524477</th>
-<td>Portugal</td>
-<td>2.870</td>
-<td>0.495</td>
-<td>5.797980</td>
-</tr>
-<tr>
-<th>1452321</th>
-<td>Sri Lanka</td>
-<td>0.276</td>
-<td>0.063</td>
-<td>4.380952</td>
-</tr>
-<tr>
-<th>801746</th>
-<td>Belgium</td>
-<td>2.891</td>
-<td>0.682</td>
-<td>4.239003</td>
-</tr>
-<tr>
-<th>8833236</th>
-<td>South Africa</td>
-<td>0.355</td>
-<td>0.103</td>
-<td>3.446602</td>
-</tr>
-<tr>
-<th>2010462</th>
-<td>China</td>
-<td>5.842</td>
-<td>2.080</td>
-<td>2.808654</td>
-</tr>
-<tr>
-<th>477852</th>
-<td>Bahrain</td>
-<td>0.064</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
-<tr>
-<th>4156318</th>
-<td>Hungary</td>
-<td>0.006</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
-<tr>
-<th>4178256</th>
-<td>Iceland</td>
-<td>0.010</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -9762,7 +8924,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>average per kg of imported saffron in the uk, 2021, descending by average</p>
+<p>saffron import data into UK 2021</p>
 </div>
 </div>
 </div>
@@ -9771,10 +8933,10 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [117]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [553]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2021_df</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2021</span>
 </pre></div>
 </div>
 </div>
@@ -9785,7 +8947,7 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[117]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[553]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -9806,54 +8968,12 @@ a.anchor-link {
 <tr style="text-align: right;">
 <th></th>
 <th>exporter</th>
-<th>value</th>
-<th>quantity</th>
-<th>average_per_kg</th>
+<th>value $</th>
+<th>quantity in tons</th>
+<th>average per kg</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<th>3707802</th>
-<td>Germany</td>
-<td>32.985</td>
-<td>0.034</td>
-<td>970.147059</td>
-</tr>
-<tr>
-<th>3844902</th>
-<td>Greece</td>
-<td>17.407</td>
-<td>0.020</td>
-<td>870.350000</td>
-</tr>
-<tr>
-<th>803353</th>
-<td>Belgium</td>
-<td>1.340</td>
-<td>0.002</td>
-<td>670.000000</td>
-</tr>
-<tr>
-<th>5525643</th>
-<td>Lebanon</td>
-<td>0.367</td>
-<td>0.001</td>
-<td>367.000000</td>
-</tr>
-<tr>
-<th>4908628</th>
-<td>Italy</td>
-<td>50.917</td>
-<td>0.195</td>
-<td>261.112821</td>
-</tr>
-<tr>
-<th>4377744</th>
-<td>Iran</td>
-<td>847.352</td>
-<td>3.444</td>
-<td>246.037166</td>
-</tr>
 <tr>
 <th>9287748</th>
 <td>Spain</td>
@@ -9862,39 +8982,11 @@ a.anchor-link {
 <td>173.346374</td>
 </tr>
 <tr>
-<th>10115797</th>
-<td>United Arab Emirates</td>
-<td>8.788</td>
-<td>0.053</td>
-<td>165.811321</td>
-</tr>
-<tr>
-<th>7413956</th>
-<td>Poland</td>
-<td>15.960</td>
-<td>0.113</td>
-<td>141.238938</td>
-</tr>
-<tr>
-<th>2616642</th>
-<td>Denmark</td>
-<td>0.067</td>
-<td>0.001</td>
-<td>67.000000</td>
-</tr>
-<tr>
-<th>2775802</th>
-<td>Estonia</td>
-<td>0.055</td>
-<td>0.001</td>
-<td>55.000000</td>
-</tr>
-<tr>
-<th>9493245</th>
-<td>Sweden</td>
-<td>9.328</td>
-<td>0.190</td>
-<td>49.094737</td>
+<th>4473078</th>
+<td>Ireland</td>
+<td>57.890</td>
+<td>8.894</td>
+<td>6.508882</td>
 </tr>
 <tr>
 <th>3265972</th>
@@ -9904,67 +8996,11 @@ a.anchor-link {
 <td>39.944550</td>
 </tr>
 <tr>
-<th>11432574</th>
-<td>USA</td>
-<td>3.624</td>
-<td>0.091</td>
-<td>39.824176</td>
-</tr>
-<tr>
-<th>2426640</th>
-<td>Czechia</td>
-<td>0.708</td>
-<td>0.026</td>
-<td>27.230769</td>
-</tr>
-<tr>
-<th>3314448</th>
-<td>Georgia</td>
-<td>0.366</td>
-<td>0.015</td>
-<td>24.400000</td>
-</tr>
-<tr>
-<th>5990</th>
-<td>Afghanistan</td>
-<td>65.425</td>
-<td>3.805</td>
-<td>17.194481</td>
-</tr>
-<tr>
-<th>10483948</th>
-<td>Türkiye</td>
-<td>2.929</td>
-<td>0.211</td>
-<td>13.881517</td>
-</tr>
-<tr>
 <th>8320747</th>
 <td>India</td>
 <td>65.180</td>
 <td>6.326</td>
 <td>10.303509</td>
-</tr>
-<tr>
-<th>11030293</th>
-<td>United Rep. of Tanzania</td>
-<td>0.010</td>
-<td>0.001</td>
-<td>10.000000</td>
-</tr>
-<tr>
-<th>7580166</th>
-<td>Portugal</td>
-<td>13.083</td>
-<td>1.317</td>
-<td>9.933941</td>
-</tr>
-<tr>
-<th>8587015</th>
-<td>Slovakia</td>
-<td>0.019</td>
-<td>0.002</td>
-<td>9.500000</td>
 </tr>
 <tr>
 <th>6757118</th>
@@ -9974,11 +9010,25 @@ a.anchor-link {
 <td>8.376554</td>
 </tr>
 <tr>
-<th>4473078</th>
-<td>Ireland</td>
-<td>57.890</td>
-<td>8.894</td>
-<td>6.508882</td>
+<th>5990</th>
+<td>Afghanistan</td>
+<td>65.425</td>
+<td>3.805</td>
+<td>17.194481</td>
+</tr>
+<tr>
+<th>4377744</th>
+<td>Iran</td>
+<td>847.352</td>
+<td>3.444</td>
+<td>246.037166</td>
+</tr>
+<tr>
+<th>7580166</th>
+<td>Portugal</td>
+<td>13.083</td>
+<td>1.317</td>
+<td>9.933941</td>
 </tr>
 <tr>
 <th>1016857</th>
@@ -9995,18 +9045,116 @@ a.anchor-link {
 <td>1.122222</td>
 </tr>
 <tr>
-<th>446950</th>
-<td>Austria</td>
-<td>0.604</td>
-<td>NaN</td>
-<td>NaN</td>
+<th>10483948</th>
+<td>Türkiye</td>
+<td>2.929</td>
+<td>0.211</td>
+<td>13.881517</td>
 </tr>
 <tr>
-<th>4192018</th>
-<td>Hungary</td>
-<td>0.007</td>
-<td>NaN</td>
-<td>NaN</td>
+<th>4908628</th>
+<td>Italy</td>
+<td>50.917</td>
+<td>0.195</td>
+<td>261.112821</td>
+</tr>
+<tr>
+<th>9493245</th>
+<td>Sweden</td>
+<td>9.328</td>
+<td>0.190</td>
+<td>49.094737</td>
+</tr>
+<tr>
+<th>7413956</th>
+<td>Poland</td>
+<td>15.960</td>
+<td>0.113</td>
+<td>141.238938</td>
+</tr>
+<tr>
+<th>11432574</th>
+<td>USA</td>
+<td>3.624</td>
+<td>0.091</td>
+<td>39.824176</td>
+</tr>
+<tr>
+<th>10115797</th>
+<td>United Arab Emirates</td>
+<td>8.788</td>
+<td>0.053</td>
+<td>165.811321</td>
+</tr>
+<tr>
+<th>3707802</th>
+<td>Germany</td>
+<td>32.985</td>
+<td>0.034</td>
+<td>970.147059</td>
+</tr>
+<tr>
+<th>2426640</th>
+<td>Czechia</td>
+<td>0.708</td>
+<td>0.026</td>
+<td>27.230769</td>
+</tr>
+<tr>
+<th>3844902</th>
+<td>Greece</td>
+<td>17.407</td>
+<td>0.020</td>
+<td>870.350000</td>
+</tr>
+<tr>
+<th>3314448</th>
+<td>Georgia</td>
+<td>0.366</td>
+<td>0.015</td>
+<td>24.400000</td>
+</tr>
+<tr>
+<th>803353</th>
+<td>Belgium</td>
+<td>1.340</td>
+<td>0.002</td>
+<td>670.000000</td>
+</tr>
+<tr>
+<th>8587015</th>
+<td>Slovakia</td>
+<td>0.019</td>
+<td>0.002</td>
+<td>9.500000</td>
+</tr>
+<tr>
+<th>5525643</th>
+<td>Lebanon</td>
+<td>0.367</td>
+<td>0.001</td>
+<td>367.000000</td>
+</tr>
+<tr>
+<th>2775802</th>
+<td>Estonia</td>
+<td>0.055</td>
+<td>0.001</td>
+<td>55.000000</td>
+</tr>
+<tr>
+<th>2616642</th>
+<td>Denmark</td>
+<td>0.067</td>
+<td>0.001</td>
+<td>67.000000</td>
+</tr>
+<tr>
+<th>11030293</th>
+<td>United Rep. of Tanzania</td>
+<td>0.010</td>
+<td>0.001</td>
+<td>10.000000</td>
 </tr>
 </tbody>
 </table>
@@ -10022,7 +9170,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>average per kg of imported saffron in the uk, 2020, descending by average</p>
+<p>saffron import data into UK 2020</p>
 </div>
 </div>
 </div>
@@ -10031,10 +9179,10 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [118]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [554]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2020_df</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2020</span>
 </pre></div>
 </div>
 </div>
@@ -10045,7 +9193,7 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[118]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[554]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -10066,12 +9214,145 @@ a.anchor-link {
 <tr style="text-align: right;">
 <th></th>
 <th>exporter</th>
-<th>value</th>
-<th>quantity</th>
-<th>average_per_kg</th>
+<th>value $</th>
+<th>quantity in tons</th>
+<th>average per kg</th>
 </tr>
 </thead>
 <tbody>
+<tr>
+<th>1925246</th>
+<td>China</td>
+<td>67.591</td>
+<td>43.200</td>
+<td>1.564606</td>
+</tr>
+<tr>
+<th>4522</th>
+<td>Afghanistan</td>
+<td>93.026</td>
+<td>11.177</td>
+<td>8.322985</td>
+</tr>
+<tr>
+<th>8833754</th>
+<td>Spain</td>
+<td>2126.049</td>
+<td>8.792</td>
+<td>241.816310</td>
+</tr>
+<tr>
+<th>7237533</th>
+<td>Portugal</td>
+<td>22.844</td>
+<td>7.755</td>
+<td>2.945712</td>
+</tr>
+<tr>
+<th>7908166</th>
+<td>India</td>
+<td>14.247</td>
+<td>6.080</td>
+<td>2.343257</td>
+</tr>
+<tr>
+<th>6440988</th>
+<td>Netherlands</td>
+<td>21.703</td>
+<td>3.341</td>
+<td>6.495959</td>
+</tr>
+<tr>
+<th>4268626</th>
+<td>Ireland</td>
+<td>12.084</td>
+<td>3.227</td>
+<td>3.744654</td>
+</tr>
+<tr>
+<th>3107328</th>
+<td>France</td>
+<td>179.776</td>
+<td>1.566</td>
+<td>114.799489</td>
+</tr>
+<tr>
+<th>4689399</th>
+<td>Italy</td>
+<td>48.192</td>
+<td>1.197</td>
+<td>40.260652</td>
+</tr>
+<tr>
+<th>4184128</th>
+<td>Iran</td>
+<td>320.420</td>
+<td>0.663</td>
+<td>483.288084</td>
+</tr>
+<tr>
+<th>3576253</th>
+<td>Ghana</td>
+<td>1.145</td>
+<td>0.500</td>
+<td>2.290000</td>
+</tr>
+<tr>
+<th>756807</th>
+<td>Belgium</td>
+<td>2.119</td>
+<td>0.141</td>
+<td>15.028369</td>
+</tr>
+<tr>
+<th>3676432</th>
+<td>Greece</td>
+<td>24.320</td>
+<td>0.033</td>
+<td>736.969697</td>
+</tr>
+<tr>
+<th>957853</th>
+<td>Brazil</td>
+<td>0.267</td>
+<td>0.030</td>
+<td>8.900000</td>
+</tr>
+<tr>
+<th>10901266</th>
+<td>Uruguay</td>
+<td>0.193</td>
+<td>0.029</td>
+<td>6.655172</td>
+</tr>
+<tr>
+<th>9618798</th>
+<td>United Arab Emirates</td>
+<td>11.289</td>
+<td>0.025</td>
+<td>451.560000</td>
+</tr>
+<tr>
+<th>7079932</th>
+<td>Poland</td>
+<td>9.353</td>
+<td>0.019</td>
+<td>492.263158</td>
+</tr>
+<tr>
+<th>7366648</th>
+<td>Romania</td>
+<td>0.772</td>
+<td>0.012</td>
+<td>64.333333</td>
+</tr>
+<tr>
+<th>4010986</th>
+<td>Hungary</td>
+<td>0.065</td>
+<td>0.005</td>
+<td>13.000000</td>
+</tr>
 <tr>
 <th>3547679</th>
 <td>Germany</td>
@@ -10094,34 +9375,6 @@ a.anchor-link {
 <td>875.000000</td>
 </tr>
 <tr>
-<th>3676432</th>
-<td>Greece</td>
-<td>24.320</td>
-<td>0.033</td>
-<td>736.969697</td>
-</tr>
-<tr>
-<th>7079932</th>
-<td>Poland</td>
-<td>9.353</td>
-<td>0.019</td>
-<td>492.263158</td>
-</tr>
-<tr>
-<th>4184128</th>
-<td>Iran</td>
-<td>320.420</td>
-<td>0.663</td>
-<td>483.288084</td>
-</tr>
-<tr>
-<th>9618798</th>
-<td>United Arab Emirates</td>
-<td>11.289</td>
-<td>0.025</td>
-<td>451.560000</td>
-</tr>
-<tr>
 <th>416448</th>
 <td>Austria</td>
 <td>0.379</td>
@@ -10134,111 +9387,6 @@ a.anchor-link {
 <td>0.298</td>
 <td>0.001</td>
 <td>298.000000</td>
-</tr>
-<tr>
-<th>8833754</th>
-<td>Spain</td>
-<td>2126.049</td>
-<td>8.792</td>
-<td>241.816310</td>
-</tr>
-<tr>
-<th>3107328</th>
-<td>France</td>
-<td>179.776</td>
-<td>1.566</td>
-<td>114.799489</td>
-</tr>
-<tr>
-<th>7366648</th>
-<td>Romania</td>
-<td>0.772</td>
-<td>0.012</td>
-<td>64.333333</td>
-</tr>
-<tr>
-<th>4689399</th>
-<td>Italy</td>
-<td>48.192</td>
-<td>1.197</td>
-<td>40.260652</td>
-</tr>
-<tr>
-<th>756807</th>
-<td>Belgium</td>
-<td>2.119</td>
-<td>0.141</td>
-<td>15.028369</td>
-</tr>
-<tr>
-<th>4010986</th>
-<td>Hungary</td>
-<td>0.065</td>
-<td>0.005</td>
-<td>13.000000</td>
-</tr>
-<tr>
-<th>957853</th>
-<td>Brazil</td>
-<td>0.267</td>
-<td>0.030</td>
-<td>8.900000</td>
-</tr>
-<tr>
-<th>4522</th>
-<td>Afghanistan</td>
-<td>93.026</td>
-<td>11.177</td>
-<td>8.322985</td>
-</tr>
-<tr>
-<th>10901266</th>
-<td>Uruguay</td>
-<td>0.193</td>
-<td>0.029</td>
-<td>6.655172</td>
-</tr>
-<tr>
-<th>6440988</th>
-<td>Netherlands</td>
-<td>21.703</td>
-<td>3.341</td>
-<td>6.495959</td>
-</tr>
-<tr>
-<th>4268626</th>
-<td>Ireland</td>
-<td>12.084</td>
-<td>3.227</td>
-<td>3.744654</td>
-</tr>
-<tr>
-<th>7237533</th>
-<td>Portugal</td>
-<td>22.844</td>
-<td>7.755</td>
-<td>2.945712</td>
-</tr>
-<tr>
-<th>7908166</th>
-<td>India</td>
-<td>14.247</td>
-<td>6.080</td>
-<td>2.343257</td>
-</tr>
-<tr>
-<th>3576253</th>
-<td>Ghana</td>
-<td>1.145</td>
-<td>0.500</td>
-<td>2.290000</td>
-</tr>
-<tr>
-<th>1925246</th>
-<td>China</td>
-<td>67.591</td>
-<td>43.200</td>
-<td>1.564606</td>
 </tr>
 </tbody>
 </table>
@@ -10254,7 +9402,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>average per kg of imported saffron in the uk, 2019, descending by average</p>
+<p>saffron import data into UK 2019</p>
 </div>
 </div>
 </div>
@@ -10263,10 +9411,10 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [119]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [555]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2019_df</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2019</span>
 </pre></div>
 </div>
 </div>
@@ -10277,7 +9425,7 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[119]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[555]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -10298,25 +9446,67 @@ a.anchor-link {
 <tr style="text-align: right;">
 <th></th>
 <th>exporter</th>
-<th>value</th>
-<th>quantity</th>
-<th>average_per_kg</th>
+<th>value $</th>
+<th>quantity in tons</th>
+<th>average per kg</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<th>6222947</th>
-<td>Morocco</td>
-<td>2.600</td>
-<td>0.001</td>
-<td>2600.000000</td>
+<th>9061907</th>
+<td>Spain</td>
+<td>2484.830</td>
+<td>67.672</td>
+<td>36.718732</td>
 </tr>
 <tr>
-<th>3629571</th>
-<td>Germany</td>
-<td>10.847</td>
-<td>0.006</td>
-<td>1807.833333</td>
+<th>1415691</th>
+<td>Sri Lanka</td>
+<td>19.530</td>
+<td>11.520</td>
+<td>1.695312</td>
+</tr>
+<tr>
+<th>7265929</th>
+<td>Poland</td>
+<td>38.643</td>
+<td>3.877</td>
+<td>9.967243</td>
+</tr>
+<tr>
+<th>6608339</th>
+<td>Netherlands</td>
+<td>13.801</td>
+<td>2.502</td>
+<td>5.515987</td>
+</tr>
+<tr>
+<th>4378684</th>
+<td>Ireland</td>
+<td>18.141</td>
+<td>2.392</td>
+<td>7.584030</td>
+</tr>
+<tr>
+<th>4037</th>
+<td>Afghanistan</td>
+<td>16.360</td>
+<td>2.056</td>
+<td>7.957198</td>
+</tr>
+<tr>
+<th>4810576</th>
+<td>Italy</td>
+<td>69.315</td>
+<td>1.081</td>
+<td>64.121184</td>
+</tr>
+<tr>
+<th>8112418</th>
+<td>India</td>
+<td>13.483</td>
+<td>0.614</td>
+<td>21.959283</td>
 </tr>
 <tr>
 <th>4295122</th>
@@ -10333,25 +9523,11 @@ a.anchor-link {
 <td>1077.720280</td>
 </tr>
 <tr>
-<th>9872320</th>
-<td>United Arab Emirates</td>
-<td>13.176</td>
-<td>0.013</td>
-<td>1013.538462</td>
-</tr>
-<tr>
-<th>3766737</th>
-<td>Greece</td>
-<td>12.149</td>
-<td>0.014</td>
-<td>867.785714</td>
-</tr>
-<tr>
-<th>9259335</th>
-<td>Sweden</td>
-<td>0.529</td>
-<td>0.001</td>
-<td>529.000000</td>
+<th>2359594</th>
+<td>Czechia</td>
+<td>0.540</td>
+<td>0.079</td>
+<td>6.835443</td>
 </tr>
 <tr>
 <th>980079</th>
@@ -10359,27 +9535,6 @@ a.anchor-link {
 <td>4.920</td>
 <td>0.047</td>
 <td>104.680851</td>
-</tr>
-<tr>
-<th>4810576</th>
-<td>Italy</td>
-<td>69.315</td>
-<td>1.081</td>
-<td>64.121184</td>
-</tr>
-<tr>
-<th>9061907</th>
-<td>Spain</td>
-<td>2484.830</td>
-<td>67.672</td>
-<td>36.718732</td>
-</tr>
-<tr>
-<th>8112418</th>
-<td>India</td>
-<td>13.483</td>
-<td>0.614</td>
-<td>21.959283</td>
 </tr>
 <tr>
 <th>777080</th>
@@ -10396,41 +9551,6 @@ a.anchor-link {
 <td>12.965517</td>
 </tr>
 <tr>
-<th>7265929</th>
-<td>Poland</td>
-<td>38.643</td>
-<td>3.877</td>
-<td>9.967243</td>
-</tr>
-<tr>
-<th>4037</th>
-<td>Afghanistan</td>
-<td>16.360</td>
-<td>2.056</td>
-<td>7.957198</td>
-</tr>
-<tr>
-<th>4378684</th>
-<td>Ireland</td>
-<td>18.141</td>
-<td>2.392</td>
-<td>7.584030</td>
-</tr>
-<tr>
-<th>2359594</th>
-<td>Czechia</td>
-<td>0.540</td>
-<td>0.079</td>
-<td>6.835443</td>
-</tr>
-<tr>
-<th>6608339</th>
-<td>Netherlands</td>
-<td>13.801</td>
-<td>2.502</td>
-<td>5.515987</td>
-</tr>
-<tr>
 <th>6234994</th>
 <td>Mozambique</td>
 <td>0.029</td>
@@ -10438,39 +9558,39 @@ a.anchor-link {
 <td>1.705882</td>
 </tr>
 <tr>
-<th>1415691</th>
-<td>Sri Lanka</td>
-<td>19.530</td>
-<td>11.520</td>
-<td>1.695312</td>
+<th>3766737</th>
+<td>Greece</td>
+<td>12.149</td>
+<td>0.014</td>
+<td>867.785714</td>
 </tr>
 <tr>
-<th>428395</th>
-<td>Austria</td>
-<td>0.111</td>
-<td>NaN</td>
-<td>NaN</td>
+<th>9872320</th>
+<td>United Arab Emirates</td>
+<td>13.176</td>
+<td>0.013</td>
+<td>1013.538462</td>
 </tr>
 <tr>
-<th>1972818</th>
-<td>China</td>
-<td>442.190</td>
-<td>NaN</td>
-<td>NaN</td>
+<th>3629571</th>
+<td>Germany</td>
+<td>10.847</td>
+<td>0.006</td>
+<td>1807.833333</td>
 </tr>
 <tr>
-<th>4114564</th>
-<td>Hungary</td>
-<td>0.061</td>
-<td>NaN</td>
-<td>NaN</td>
+<th>6222947</th>
+<td>Morocco</td>
+<td>2.600</td>
+<td>0.001</td>
+<td>2600.000000</td>
 </tr>
 <tr>
-<th>7425168</th>
-<td>Portugal</td>
-<td>26.341</td>
-<td>NaN</td>
-<td>NaN</td>
+<th>9259335</th>
+<td>Sweden</td>
+<td>0.529</td>
+<td>0.001</td>
+<td>529.000000</td>
 </tr>
 </tbody>
 </table>
@@ -10486,7 +9606,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>average per kg of imported saffron in the uk, 2018, descending by average</p>
+<p>saffron import data into UK 2018</p>
 </div>
 </div>
 </div>
@@ -10495,10 +9615,10 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [120]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [556]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2018_df</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2018</span>
 </pre></div>
 </div>
 </div>
@@ -10509,7 +9629,7 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[120]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[556]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -10530,12 +9650,131 @@ a.anchor-link {
 <tr style="text-align: right;">
 <th></th>
 <th>exporter</th>
-<th>value</th>
-<th>quantity</th>
-<th>average_per_kg</th>
+<th>value $</th>
+<th>quantity in tons</th>
+<th>average per kg</th>
 </tr>
 </thead>
 <tbody>
+<tr>
+<th>1878304</th>
+<td>China</td>
+<td>536.375</td>
+<td>18.219</td>
+<td>29.440419</td>
+</tr>
+<tr>
+<th>7152364</th>
+<td>Portugal</td>
+<td>35.460</td>
+<td>4.474</td>
+<td>7.925793</td>
+</tr>
+<tr>
+<th>8742769</th>
+<td>Spain</td>
+<td>2730.246</td>
+<td>3.522</td>
+<td>775.197615</td>
+</tr>
+<tr>
+<th>4217374</th>
+<td>Ireland</td>
+<td>30.961</td>
+<td>3.176</td>
+<td>9.748426</td>
+</tr>
+<tr>
+<th>4640208</th>
+<td>Italy</td>
+<td>114.857</td>
+<td>1.955</td>
+<td>58.750384</td>
+</tr>
+<tr>
+<th>4136550</th>
+<td>Iran</td>
+<td>579.807</td>
+<td>1.632</td>
+<td>355.273897</td>
+</tr>
+<tr>
+<th>6998246</th>
+<td>Poland</td>
+<td>33.159</td>
+<td>0.724</td>
+<td>45.799724</td>
+</tr>
+<tr>
+<th>5214430</th>
+<td>Lebanon</td>
+<td>1.849</td>
+<td>0.570</td>
+<td>3.243860</td>
+</tr>
+<tr>
+<th>3054927</th>
+<td>France</td>
+<td>256.304</td>
+<td>0.219</td>
+<td>1170.337900</td>
+</tr>
+<tr>
+<th>6372916</th>
+<td>Netherlands</td>
+<td>2.348</td>
+<td>0.162</td>
+<td>14.493827</td>
+</tr>
+<tr>
+<th>2259608</th>
+<td>Czechia</td>
+<td>0.783</td>
+<td>0.101</td>
+<td>7.752475</td>
+</tr>
+<tr>
+<th>3493692</th>
+<td>Germany</td>
+<td>9.099</td>
+<td>0.061</td>
+<td>149.163934</td>
+</tr>
+<tr>
+<th>3600</th>
+<td>Afghanistan</td>
+<td>1.301</td>
+<td>0.039</td>
+<td>33.358974</td>
+</tr>
+<tr>
+<th>7816419</th>
+<td>India</td>
+<td>25.254</td>
+<td>0.023</td>
+<td>1098.000000</td>
+</tr>
+<tr>
+<th>749450</th>
+<td>Belgium</td>
+<td>0.233</td>
+<td>0.022</td>
+<td>10.590909</td>
+</tr>
+<tr>
+<th>3624698</th>
+<td>Greece</td>
+<td>28.161</td>
+<td>0.018</td>
+<td>1564.500000</td>
+</tr>
+<tr>
+<th>937744</th>
+<td>Brazil</td>
+<td>0.035</td>
+<td>0.006</td>
+<td>5.833333</td>
+</tr>
 <tr>
 <th>6002108</th>
 <td>Morocco</td>
@@ -10550,146 +9789,6 @@ a.anchor-link {
 <td>0.001</td>
 <td>1727.000000</td>
 </tr>
-<tr>
-<th>3624698</th>
-<td>Greece</td>
-<td>28.161</td>
-<td>0.018</td>
-<td>1564.500000</td>
-</tr>
-<tr>
-<th>3054927</th>
-<td>France</td>
-<td>256.304</td>
-<td>0.219</td>
-<td>1170.337900</td>
-</tr>
-<tr>
-<th>7816419</th>
-<td>India</td>
-<td>25.254</td>
-<td>0.023</td>
-<td>1098.000000</td>
-</tr>
-<tr>
-<th>8742769</th>
-<td>Spain</td>
-<td>2730.246</td>
-<td>3.522</td>
-<td>775.197615</td>
-</tr>
-<tr>
-<th>4136550</th>
-<td>Iran</td>
-<td>579.807</td>
-<td>1.632</td>
-<td>355.273897</td>
-</tr>
-<tr>
-<th>3493692</th>
-<td>Germany</td>
-<td>9.099</td>
-<td>0.061</td>
-<td>149.163934</td>
-</tr>
-<tr>
-<th>4640208</th>
-<td>Italy</td>
-<td>114.857</td>
-<td>1.955</td>
-<td>58.750384</td>
-</tr>
-<tr>
-<th>6998246</th>
-<td>Poland</td>
-<td>33.159</td>
-<td>0.724</td>
-<td>45.799724</td>
-</tr>
-<tr>
-<th>3600</th>
-<td>Afghanistan</td>
-<td>1.301</td>
-<td>0.039</td>
-<td>33.358974</td>
-</tr>
-<tr>
-<th>1878304</th>
-<td>China</td>
-<td>536.375</td>
-<td>18.219</td>
-<td>29.440419</td>
-</tr>
-<tr>
-<th>6372916</th>
-<td>Netherlands</td>
-<td>2.348</td>
-<td>0.162</td>
-<td>14.493827</td>
-</tr>
-<tr>
-<th>749450</th>
-<td>Belgium</td>
-<td>0.233</td>
-<td>0.022</td>
-<td>10.590909</td>
-</tr>
-<tr>
-<th>4217374</th>
-<td>Ireland</td>
-<td>30.961</td>
-<td>3.176</td>
-<td>9.748426</td>
-</tr>
-<tr>
-<th>7152364</th>
-<td>Portugal</td>
-<td>35.460</td>
-<td>4.474</td>
-<td>7.925793</td>
-</tr>
-<tr>
-<th>2259608</th>
-<td>Czechia</td>
-<td>0.783</td>
-<td>0.101</td>
-<td>7.752475</td>
-</tr>
-<tr>
-<th>937744</th>
-<td>Brazil</td>
-<td>0.035</td>
-<td>0.006</td>
-<td>5.833333</td>
-</tr>
-<tr>
-<th>5214430</th>
-<td>Lebanon</td>
-<td>1.849</td>
-<td>0.570</td>
-<td>3.243860</td>
-</tr>
-<tr>
-<th>414655</th>
-<td>Austria</td>
-<td>0.250</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
-<tr>
-<th>3959419</th>
-<td>Hungary</td>
-<td>0.057</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
-<tr>
-<th>7279016</th>
-<td>Romania</td>
-<td>0.013</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -10704,7 +9803,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>average per kg of imported saffron in the uk, 2017, descending by average</p>
+<p>saffron import data into UK 2017</p>
 </div>
 </div>
 </div>
@@ -10713,10 +9812,10 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [121]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [557]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2017_df</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">data_saffron_uk_2017</span>
 </pre></div>
 </div>
 </div>
@@ -10727,7 +9826,7 @@ a.anchor-link {
 </div>
 <div class="jp-OutputArea jp-Cell-outputArea">
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
-<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[121]:</div>
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[557]:</div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/html" tabindex="0">
 <div>
 <style scoped="">
@@ -10748,67 +9847,18 @@ a.anchor-link {
 <tr style="text-align: right;">
 <th></th>
 <th>exporter</th>
-<th>value</th>
-<th>quantity</th>
-<th>average_per_kg</th>
+<th>value $</th>
+<th>quantity in tons</th>
+<th>average per kg</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<th>1765556</th>
-<td>China</td>
-<td>664.238</td>
-<td>0.096</td>
-<td>6919.145833</td>
-</tr>
-<tr>
-<th>8331367</th>
-<td>Sweden</td>
-<td>1.407</td>
-<td>0.001</td>
-<td>1407.000000</td>
-</tr>
-<tr>
-<th>3316473</th>
-<td>Germany</td>
-<td>1.160</td>
-<td>0.001</td>
-<td>1160.000000</td>
-</tr>
-<tr>
-<th>2763</th>
-<td>Afghanistan</td>
-<td>5.447</td>
-<td>0.006</td>
-<td>907.833333</td>
-</tr>
-<tr>
-<th>3432367</th>
-<td>Greece</td>
-<td>13.599</td>
-<td>0.022</td>
-<td>618.136364</td>
-</tr>
-<tr>
-<th>2889820</th>
-<td>France</td>
-<td>244.398</td>
-<td>0.432</td>
-<td>565.736111</td>
-</tr>
-<tr>
-<th>3911568</th>
-<td>Iran</td>
-<td>699.112</td>
-<td>2.976</td>
-<td>234.916667</td>
-</tr>
-<tr>
-<th>7335652</th>
-<td>India</td>
-<td>3.230</td>
-<td>0.016</td>
-<td>201.875000</td>
+<th>701855</th>
+<td>Belgium</td>
+<td>129.175</td>
+<td>45.176</td>
+<td>2.859372</td>
 </tr>
 <tr>
 <th>8144619</th>
@@ -10818,81 +9868,11 @@ a.anchor-link {
 <td>101.201573</td>
 </tr>
 <tr>
-<th>6587059</th>
-<td>Poland</td>
-<td>7.606</td>
-<td>0.089</td>
-<td>85.460674</td>
-</tr>
-<tr>
-<th>4396334</th>
-<td>Italy</td>
-<td>88.333</td>
-<td>2.807</td>
-<td>31.468828</td>
-</tr>
-<tr>
 <th>6000895</th>
 <td>Netherlands</td>
 <td>260.747</td>
 <td>18.950</td>
 <td>13.759736</td>
-</tr>
-<tr>
-<th>6732711</th>
-<td>Portugal</td>
-<td>46.242</td>
-<td>3.530</td>
-<td>13.099717</td>
-</tr>
-<tr>
-<th>6847500</th>
-<td>Romania</td>
-<td>0.012</td>
-<td>0.001</td>
-<td>12.000000</td>
-</tr>
-<tr>
-<th>5389443</th>
-<td>Mexico</td>
-<td>7.437</td>
-<td>0.767</td>
-<td>9.696219</td>
-</tr>
-<tr>
-<th>2128785</th>
-<td>Czechia</td>
-<td>0.027</td>
-<td>0.003</td>
-<td>9.000000</td>
-</tr>
-<tr>
-<th>9881670</th>
-<td>USA</td>
-<td>3.403</td>
-<td>0.430</td>
-<td>7.913953</td>
-</tr>
-<tr>
-<th>3988104</th>
-<td>Ireland</td>
-<td>23.393</td>
-<td>4.204</td>
-<td>5.564462</td>
-</tr>
-<tr>
-<th>701855</th>
-<td>Belgium</td>
-<td>129.175</td>
-<td>45.176</td>
-<td>2.859372</td>
-</tr>
-<tr>
-<th>4925324</th>
-<td>Lebanon</td>
-<td>1.961</td>
-<td>0.822</td>
-<td>2.385645</td>
 </tr>
 <tr>
 <th>6110365</th>
@@ -10902,18 +9882,123 @@ a.anchor-link {
 <td>0.055165</td>
 </tr>
 <tr>
-<th>384100</th>
-<td>Austria</td>
-<td>0.008</td>
-<td>NaN</td>
-<td>NaN</td>
+<th>3988104</th>
+<td>Ireland</td>
+<td>23.393</td>
+<td>4.204</td>
+<td>5.564462</td>
 </tr>
 <tr>
-<th>3746388</th>
-<td>Hungary</td>
-<td>0.064</td>
-<td>NaN</td>
-<td>NaN</td>
+<th>6732711</th>
+<td>Portugal</td>
+<td>46.242</td>
+<td>3.530</td>
+<td>13.099717</td>
+</tr>
+<tr>
+<th>3911568</th>
+<td>Iran</td>
+<td>699.112</td>
+<td>2.976</td>
+<td>234.916667</td>
+</tr>
+<tr>
+<th>4396334</th>
+<td>Italy</td>
+<td>88.333</td>
+<td>2.807</td>
+<td>31.468828</td>
+</tr>
+<tr>
+<th>4925324</th>
+<td>Lebanon</td>
+<td>1.961</td>
+<td>0.822</td>
+<td>2.385645</td>
+</tr>
+<tr>
+<th>5389443</th>
+<td>Mexico</td>
+<td>7.437</td>
+<td>0.767</td>
+<td>9.696219</td>
+</tr>
+<tr>
+<th>2889820</th>
+<td>France</td>
+<td>244.398</td>
+<td>0.432</td>
+<td>565.736111</td>
+</tr>
+<tr>
+<th>9881670</th>
+<td>USA</td>
+<td>3.403</td>
+<td>0.430</td>
+<td>7.913953</td>
+</tr>
+<tr>
+<th>1765556</th>
+<td>China</td>
+<td>664.238</td>
+<td>0.096</td>
+<td>6919.145833</td>
+</tr>
+<tr>
+<th>6587059</th>
+<td>Poland</td>
+<td>7.606</td>
+<td>0.089</td>
+<td>85.460674</td>
+</tr>
+<tr>
+<th>3432367</th>
+<td>Greece</td>
+<td>13.599</td>
+<td>0.022</td>
+<td>618.136364</td>
+</tr>
+<tr>
+<th>7335652</th>
+<td>India</td>
+<td>3.230</td>
+<td>0.016</td>
+<td>201.875000</td>
+</tr>
+<tr>
+<th>2763</th>
+<td>Afghanistan</td>
+<td>5.447</td>
+<td>0.006</td>
+<td>907.833333</td>
+</tr>
+<tr>
+<th>2128785</th>
+<td>Czechia</td>
+<td>0.027</td>
+<td>0.003</td>
+<td>9.000000</td>
+</tr>
+<tr>
+<th>3316473</th>
+<td>Germany</td>
+<td>1.160</td>
+<td>0.001</td>
+<td>1160.000000</td>
+</tr>
+<tr>
+<th>6847500</th>
+<td>Romania</td>
+<td>0.012</td>
+<td>0.001</td>
+<td>12.000000</td>
+</tr>
+<tr>
+<th>8331367</th>
+<td>Sweden</td>
+<td>1.407</td>
+<td>0.001</td>
+<td>1407.000000</td>
 </tr>
 </tbody>
 </table>
